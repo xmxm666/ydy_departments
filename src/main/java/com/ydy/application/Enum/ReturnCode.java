@@ -10,6 +10,10 @@ import com.ydy.application.util.JsonUtil;
 public enum ReturnCode {
 	
 	SUCCESS("1000","接口调用成功"),
+
+	LOGIN_FAIL("10001","用户名或密码错误"),
+	ERROR_PASSWORD("10002","密码错误"),
+
 	SERVICE_UNAVAILABLE("2000","服务不可用"),
 	NO_TOKEN("2001","没有令牌信息,请重新登录"),
 	TOKEN_INVALID("2002","令牌无效或已过期"),
@@ -17,9 +21,16 @@ public enum ReturnCode {
 	RESOURCE_NOT_FOUND("3001","资源没找到或不存在"),
 	RESOURCE_EXIST("3002","资源已存在"),
 	READ_FILE_FAIL("3003","文件读取失败"),
+
 	SAVE_FAIL("3004","保存失败"),
-	UPDATE_FAIL("3007","更新失败"),
+	SAVE_FAIL_ROLE("30041","保存失败：请选择角色！"),
+	SAVE_FAIL_SECTION("30042","保存失败：请选择科室！"),
+	SAVE_FAIL_ROOM("30043","保存失败：请选择病房！"),
+	SAVE_FAIL_BED("30044","保存失败：请选择病床！"),
 	DELETE_FAIL("3005","删除失败"),
+	DELETE_FAIL_PATIENT("30051","删除失败：该病床还有患者！"),
+	UPDATE_FAIL("3007","更新失败"),
+
 	NOT_ALLOWED_COMPANY("3006","对企业权限不够，操作被不允许"),
 	NOT_COMPANY_EXTIS("3008","指定访问的企业code信息不存在，拒绝访问"),
 	NOT_COMPANY_PARAM_INVALID("3009","没有指定访问的企业code，拒绝访问"),

@@ -80,10 +80,10 @@ public class DepartmentsPatientServiceImpl extends ServiceImpl<DepartmentsPatien
 	@Override
 	public Response insertOrUpdate(DepartmentsPatientDTO patientDTO) {
 		if(patientDTO.getRid() == null) {
-			return Response.returnCode(ReturnCode.SAVE_FAIL.getCode(), "保存失败：请选择病房");
+			return Response.returnCode(ReturnCode.SAVE_FAIL_ROOM);
 		}
 		if(patientDTO.getBid() == null) {
-			return Response.returnCode(ReturnCode.SAVE_FAIL.getCode(), "保存失败：请选择病床");
+			return Response.returnCode(ReturnCode.SAVE_FAIL_BED);
 		}
 		//查看病房-病床是否有患者
 		DepartmentsRBDP rbdp = new DepartmentsRBDP();

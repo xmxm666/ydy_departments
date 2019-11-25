@@ -64,7 +64,7 @@ public class DepartmentsBedServiceImpl extends ServiceImpl<DepartmentsBedMapper,
 		//检查该病床是否有患者
 		Integer patientCount = departmentsRBDPMapper.selectCount(new EntityWrapper<DepartmentsRBDP>().eq("bid", id).isNotNull("pid"));
 		if(patientCount != null && patientCount != 0) {
-			return Response.returnCode(ReturnCode.DELETE_FAIL.getCode(), "删除失败：该病床还有患者");
+			return Response.returnCode(ReturnCode.DELETE_FAIL_PATIENT);
 		}
 
 		//删除 病房-病床 关联
