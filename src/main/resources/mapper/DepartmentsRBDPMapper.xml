@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.ydy.application.mapper.department.DepartmentsRBDPMapper">
+
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.ydy.application.entity.department.DepartmentsRBDP">
+		<result column="rid" property="rid" />
+		<result column="bid" property="bid" />
+		<result column="did" property="did" />
+		<result column="pid" property="pid" />
+	</resultMap>
+
+	<update id="deleteDevice">
+		update departments_room_bed_dev_pat set did = null where rid = #{rid}
+	</update>
+
+	<update id="setPatient" parameterType="com.ydy.application.entity.department.DepartmentsRBDP">
+		update departments_room_bed_dev_pat set pid = #{pid} where rid = #{rid} and bid = #{bid}
+	</update>
+
+	<update id="deletePatient" parameterType="com.ydy.application.entity.department.DepartmentsRBDP">
+		update departments_room_bed_dev_pat set pid = null where pid = #{pid}
+	</update>
+
+	<update id="deleteDeviceByDid">
+		update departments_room_bed_dev_pat set did = null where did = #{did}
+	</update>
+
+</mapper>

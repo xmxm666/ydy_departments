@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ydy.application.mapper.department.DepartmentsAdminMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ydy.application.entity.department.DepartmentsAdmin">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="creat_time" property="creatTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, username, password, creat_time AS creatTime
+    </sql>
+
+    <select id="selectAdmin" resultType="com.ydy.application.dto.department.DepartmentsAdminDTO">
+        SELECT a.id, a.username, a.section_id as sectionId, s.`name` as sectionName
+        FROM departments_admin a
+        LEFT JOIN departments_section s on a.section_id = s.id
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="getPageListCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(1)
+        from departments_admin a
+        LEFT JOIN departments_section s on a.section_id = s.id
+        LEFT JOIN departments_hospital h on s.hospital_id = h.id
+        WHERE 1=1
+        <if test="role != null">
+            and a.role = #{role}
+        </if>
+        <if test="sectionId != null">
+            and s.id = #{sectionId}
+        </if>
+        <if test="hospitalId != null">
+            and h.id = #{hospitalId}
+        </if>
+    </select>
+
+    <select id="getPageList" parameterType="java.util.Map" resultType="com.ydy.application.dto.department.DepartmentsAdminDTO">
+        select a.id, a.username, a.section_id, s.`name` as sectionName
+        from departments_admin a
+        LEFT JOIN departments_section s on a.section_id = s.id
+        LEFT JOIN departments_hospital h on s.hospital_id = h.id
+        WHERE 1=1
+        <if test="role != null">
+            and a.role = #{role}
+        </if>
+        <if test="sectionId != null">
+            and s.id = #{sectionId}
+        </if>
+        <if test="hospitalId != null">
+            and h.id = #{hospitalId}
+        </if>
+        <if test="offset != null and offset > 0">
+            limit #{limit} , #{offset}
+        </if>
+    </select>
+
+</mapper>

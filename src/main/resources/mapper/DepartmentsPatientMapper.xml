@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ydy.application.mapper.department.DepartmentsPatientMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ydy.application.entity.department.DepartmentsPatient">
+        <id column="id" property="id" />
+        <result column="section_id" property="sectionId" />
+        <result column="caseno" property="caseno" />
+        <result column="name" property="name" />
+        <result column="sex" property="sex" />
+        <result column="age" property="age" />
+        <result column="history" property="history" />
+        <result column="creat_time" property="creatTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, section_id AS sectionId, caseno, name, sex, age, history, creat_time AS creatTime
+    </sql>
+
+    <select id="getPageListCount" resultType="java.lang.Integer">
+		select count(1) from departments_patient where history = 0 and section_id = #{sectionId}
+	</select>
+
+    <select id="getPageList" parameterType="java.util.Map" resultType="com.ydy.application.dto.department.DepartmentsPatientDTO">
+        SELECT p.id, p.caseno, p.name, p.doctor, p.sex, p.age, r.id rid, r.room_name, b.id bid, b.bed_name, d.id did, d.device_number
+        FROM departments_patient p
+        LEFT JOIN departments_room_bed_dev_pat rbdp on p.id = rbdp.pid
+        LEFT JOIN departments_room r on rbdp.rid = r.id
+        LEFT JOIN departments_bed b on rbdp.bid = b.id
+        LEFT JOIN departments_device d on rbdp.did = d.id
+        WHERE p.history = 0 and p.section_id = #{sectionId}
+        <if test="offset != null and offset > 0">
+            limit #{limit} , #{offset}
+        </if>
+    </select>
+
+    <select id="selectPatient" resultType="com.ydy.application.dto.department.DepartmentsPatientDTO">
+        SELECT p.id, p.caseno, p.name, p.doctor, p.age, p.sex, r.id rid, r.room_name, b.id bid, b.bed_name
+        FROM departments_patient p
+        LEFT JOIN departments_room_bed_dev_pat rbdp on p.id = rbdp.pid
+        LEFT JOIN departments_room r on rbdp.rid = r.id
+        LEFT JOIN departments_bed b on rbdp.bid = b.id
+        WHERE p.id = #{id}
+    </select>
+
+</mapper>

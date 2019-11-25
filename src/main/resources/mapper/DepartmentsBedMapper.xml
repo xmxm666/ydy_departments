@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ydy.application.mapper.department.DepartmentsBedMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ydy.application.entity.department.DepartmentsBed">
+        <id column="id" property="id" />
+        <result column="section_id" property="sectionId" />
+        <result column="bed_name" property="bedName" />
+        <result column="type" property="type" />
+        <result column="creat_time" property="creatTime" />
+    </resultMap>
+    
+     <!-- 通用查询映射结果 -->
+    <resultMap id="DepartmentsBedDTOMap" type="com.ydy.application.dto.department.DepartmentsBedDetailDTO">
+        <id column="id" property="id" />
+        <result column="section_id" property="sectionId" />
+        <result column="bed_name" property="bedName" />
+        <result column="type" property="type" />
+        <result column="creat_time" property="creatTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, section_id AS sectionId, bed_name AS bedName, type, creat_time AS creatTime
+    </sql>
+    
+    <select id="getDepartmentsBedPageList" resultMap="DepartmentsBedDTOMap" >
+    	select * from departments_bed db , departments_room dr 
+    	where db.room.id = dr.id and db.is_deleted = 0  
+    	and db.bind_status = 1 and dr.is_deleted = 0
+    
+    </select>
+
+    <select id="getBedByRoomId" resultType="com.ydy.application.dto.department.DepartmentsBedDTO" >
+    	select b.id, b.bed_name as bedName, rbdp.pid
+    	from departments_bed b
+    	left join departments_room_bed_dev_pat rbdp on b.id = rbdp.bid
+    	where rbdp.rid = #{rid}
+    </select>
+    
+    
+    
+
+</mapper> 

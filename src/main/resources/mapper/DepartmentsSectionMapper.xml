@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ydy.application.mapper.department.DepartmentsSectionMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ydy.application.entity.department.DepartmentsSection">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="creat_time" property="creatTime" />
+        <result column="hospital_id" property="hospitalId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, creat_time AS creatTime, hospital_id AS hospitalId,
+    </sql>
+
+    <select id="getPageListCount" resultType="java.lang.Integer">
+		select count(1) from departments_section where is_deleted = 0
+		<if test="map.hospitalId != null">
+            and hospital_id = #{map.hospitalId}
+        </if>
+	</select>
+
+    <select id="getPageList" resultType="com.ydy.application.dto.department.DepartmentsSectionDTO">
+        SELECT s.id, s.`name`, s.hospital_id as hospitalId, h.`name` as hospitalName
+        FROM departments_section s
+        LEFT JOIN departments_hospital h on s.hospital_id = h.id
+        WHERE s.is_deleted = 0
+        <if test="map.hospitalId != null">
+            and s.hospital_id = #{map.hospitalId}
+        </if>
+        <if test="map.offset != null and map.offset > 0">
+            limit #{map.limit} , #{map.offset}
+        </if>
+    </select>
+
+</mapper>

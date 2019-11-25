@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.ydy.application.mapper.department.DepartmentsRoomMapper">
+
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.ydy.application.entity.department.DepartmentsRoom">
+		<id column="id" property="id" />
+		<result column="section_id" property="sectionId" />
+		<result column="room_name" property="roomName" />
+		<result column="creat_time" property="creatTime" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, section_id AS sectionId, room_name AS roomName, creat_time AS
+		creatTime
+	</sql>
+
+	<select id="getDepartmentsRoomList" resultMap="roomDTOMap">
+		SELECT r.id, r.room_name, b.id as bid, b.bed_name
+		FROM (SELECT * FROM departments_room
+		WHERE is_deleted = 0 AND section_id = #{map.sectionId}
+		<if test="map.offset != null and map.offset > 0">
+			limit #{map.limit} , #{map.offset}
+		</if>
+		) r
+		LEFT JOIN departments_room_bed_dev_pat rbdp on r.id = rbdp.rid
+		LEFT JOIN departments_bed b on rbdp.bid = b.id
+	</select>
+	
+	<select id="getDepartmentsRoomListCount" resultType="java.lang.Integer">
+		select count(1) from departments_room where is_deleted = 0 and section_id =
+		#{map.sectionId}
+	</select>
+
+
+	<resultMap id="roomDTOMap"
+			   type="com.ydy.application.dto.department.DepartmentsRoomDTO">
+		<id column="id" property="id" />
+		<result column="section_id" property="sectionId" />
+		<result column="room_name" property="roomName" />
+		<result column="creat_time" property="creatTime" />
+		<collection property="bedList"
+					ofType="com.ydy.application.dto.department.DepartmentsBedDTO">
+			<id column="bid" property="id" />
+			<result column="section_id" property="sectionId" />
+			<result column="bed_name" property="bedName" />
+			<result column="type" property="type" />
+			<result column="creat_time" property="creatTime" />
+			<association property="device" javaType="com.ydy.application.entity.department.DepartmentsDevice">
+				<id column="did" property="id"/>
+				<result column="device_number" property="deviceNumber"/>
+			</association>
+		</collection>
+	</resultMap>
+	<select id="selectRoom" resultMap="roomDTOMap">
+		SELECT r.id, r.room_name, b.id bid, b.bed_name, d.id did, d.device_number
+		FROM departments_room r
+		LEFT JOIN departments_room_bed_dev_pat rbdp on rbdp.rid = r.id
+		LEFT JOIN departments_bed b on rbdp.bid = b.id
+		LEFT JOIN departments_device d on rbdp.did = d.id
+		WHERE r.id = #{id}
+	</select>
+
+</mapper>
