@@ -7,8 +7,6 @@ import lombok.ToString;
 
 /**
  * 网关信息
- * 
- * 
  */
 @Data
 public class AuthTokenDTO {

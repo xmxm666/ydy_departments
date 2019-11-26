@@ -26,10 +26,9 @@ public interface DepartmentsAdminService extends IService<DepartmentsAdmin> {
 	/**
 	 * 医生登录
 	 * @param req
-	 * @param resp
 	 * @return
 	 */
-	Response departmentsAdminLogin(DepartmentsAdmin req, HttpServletResponse resp);
+	Response departmentsAdminLogin(DepartmentsAdmin admin);
 
 	/**
 	 * 根据id查找admin 带科室

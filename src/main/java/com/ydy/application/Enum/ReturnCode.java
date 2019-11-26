@@ -12,6 +12,7 @@ public enum ReturnCode {
 	SUCCESS("1000","接口调用成功"),
 
 	LOGIN_FAIL("10001","用户名或密码错误"),
+	LOGIN_FAIL_AUTHENTICATION("10003","认证失败"),
 	ERROR_PASSWORD("10002","密码错误"),
 
 	SERVICE_UNAVAILABLE("2000","服务不可用"),
@@ -31,6 +32,7 @@ public enum ReturnCode {
 	DELETE_FAIL_PATIENT("30051","删除失败：该病床还有患者！"),
 	UPDATE_FAIL("3007","更新失败"),
 
+	NOT_ROLE_OPERATION("3016","没有角色操作权限，拒绝访问"),
 	NOT_ALLOWED_COMPANY("3006","对企业权限不够，操作被不允许"),
 	NOT_COMPANY_EXTIS("3008","指定访问的企业code信息不存在，拒绝访问"),
 	NOT_COMPANY_PARAM_INVALID("3009","没有指定访问的企业code，拒绝访问"),
@@ -40,7 +42,7 @@ public enum ReturnCode {
 	NOT_SITE_CODE("3013","没有指定访问的站点code，拒绝访问"),
 	NOT_SITE_INFO_CODE("3014","指定的站点code信息不存在，拒绝访问"),
 	NOT_SITE_ACCESS("3015","没有站点访问权限，拒绝访问"),
-	NOT_ROLE_OPERATION("3016","没有角色操作权限，拒绝访问"),
+
 	BIZ_FAIL("4000","业务处理失败"),
 	ACCOUNT_CLOSE("5000","账号未开通或者被锁定"),
 	ACCOUNT_INVALID("5001","账号已经失效");

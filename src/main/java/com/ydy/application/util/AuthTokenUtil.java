@@ -3,9 +3,11 @@ package com.ydy.application.util;
 import java.util.Date;
 import java.util.Map;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.ydy.application.Enum.PLAT_TYPE;
+import com.ydy.application.filter.AuthTokenDTO;
+import io.jsonwebtoken.*;
+
+import javax.xml.bind.DatatypeConverter;
 
 public class AuthTokenUtil {
 	

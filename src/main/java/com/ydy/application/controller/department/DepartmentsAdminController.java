@@ -1,9 +1,12 @@
 package com.ydy.application.controller.department;
 
 
+import java.io.IOException;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -97,9 +100,12 @@ public class DepartmentsAdminController {
      */
     @ResponseBody
     @PostMapping("/login")
-    public Response departmentsAdminLogin(@RequestBody @Valid DepartmentsAdmin req , HttpServletResponse resp) {
-        return departmentsAdminService.departmentsAdminLogin(req , resp);
+    public Response departmentsAdminLogin(HttpServletRequest request, HttpServletResponse response) {
+        Enumeration<String> parameterNames = request.getParameterNames();
+
+        return departmentsAdminService.departmentsAdminLogin(null);
     }
+
 
 	/**
      * 更新

@@ -1,6 +1,8 @@
 package com.ydy.application.util;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -9,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.util.CollectionUtils;
 
 public class JsonUtil {
 
@@ -211,5 +214,19 @@ public class JsonUtil {
 	public static String getJSONString(Object object) throws Exception {
 		String jsonString = null;
 		return jsonString == null ? "{}" : jsonString;
+	}
+
+	/**
+	 * 分割字符串进SET
+	 */
+	@SuppressWarnings("unchecked")
+	public static Set<String> split(String str) {
+
+		Set<String> set = new HashSet<>();
+		if (org.springframework.util.StringUtils.isEmpty(str)) {
+			return set;
+		}
+		set.addAll(CollectionUtils.arrayToList(str.split(",")));
+		return set;
 	}
 }

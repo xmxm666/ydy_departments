@@ -11,7 +11,7 @@ import com.ydy.application.interceptor.AuthorityInterceptor;
  * 和springmvc的webmvc拦截配置一样
  * @author BIANP
  */
-@Configuration
+//@Configuration
 public class WebConfigurer implements WebMvcConfigurer {
 	 @Override
 	 public void addInterceptors(InterceptorRegistry registry) {

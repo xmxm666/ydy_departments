@@ -57,13 +57,13 @@ public class DepartmentsAdminServiceImpl extends ServiceImpl<DepartmentsAdminMap
 	}
 
 	@Override
-	public Response departmentsAdminLogin(DepartmentsAdmin admin , HttpServletResponse resp) {
+	public Response departmentsAdminLogin(DepartmentsAdmin admin) {
 		EntityWrapper<DepartmentsAdmin> wrapper = new EntityWrapper<DepartmentsAdmin>();
 		wrapper.eq("username", admin.getUsername()).and().eq("password", Md5HexMethod.MD5Encode(admin.getPassword()));
 		DepartmentsAdmin departmentsAdmin = this.selectOne(wrapper);
 		if (null != departmentsAdmin) {
 			String token = createToken(departmentsAdmin);
-			resp.addHeader("token", token);
+			/*resp.addHeader("token", token);*/
 
 			HashMap<String, Object> map = new HashMap();
 			map.put("token", token);
