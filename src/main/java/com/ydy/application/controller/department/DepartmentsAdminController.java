@@ -1,37 +1,22 @@
 package com.ydy.application.controller.department;
 
 
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.ydy.application.dto.department.DepartmentsAdminDTO;
+import com.ydy.application.entity.department.DepartmentsAdmin;
+import com.ydy.application.service.department.DepartmentsAdminService;
+import com.ydy.application.util.Response;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
-import com.alibaba.fastjson.JSONObject;
-import com.ydy.application.util.PageDTO;
-import org.apache.tomcat.util.security.MD5Encoder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.ydy.application.dto.department.DepartMentLoginDTO;
-import com.ydy.application.entity.department.DepartmentsAdmin;
-import com.ydy.application.service.department.DepartmentsAdminService;
-import com.ydy.application.util.Response;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.Map;
 /**
  *  医生
  * @author rz123
@@ -55,7 +40,6 @@ public class DepartmentsAdminController {
      * @apiGroup admin
      * @apiParam  {Number} currPage 页数
      * @apiParam  {Number} pageSize 每页数量
-     * @apiParam  {Number} role 角色   0-管理员， 1-医生
      * @apiParam  {Number} hospitalId 医院id
      * @apiParam  {Number} sectionId    科室id
      */
@@ -65,7 +49,6 @@ public class DepartmentsAdminController {
         Map<String,Object> queryInfo = (Map) json;
         queryInfo.put("limit", (json.getInteger("currPage")-1)*json.getInteger("pageSize"));
         queryInfo.put("offset",json.getInteger("pageSize"));
-        queryInfo.put("role",json.getInteger("role"));
         queryInfo.put("hospitalId",json.getInteger("hospitalId"));
         queryInfo.put("sectionId",json.getInteger("sectionId"));
         return Response.ok(departmentsAdminService.selectPageList(queryInfo));
@@ -83,12 +66,11 @@ public class DepartmentsAdminController {
      * @apiGroup admin
      * @apiParam  {String} username 用户名
      * @apiParam  {String} password 密码
-     * @apiParam  {String} role 角色   0-管理员， 1-医生
      * @apiParam  {String} sectionId 科室id
      */
     @ResponseBody
     @PostMapping
-    public Response departmentsAdminInsert(@RequestBody @Valid DepartmentsAdmin departmentsAdmin) {
+    public Response departmentsAdminInsert(@RequestBody @Valid DepartmentsAdminDTO departmentsAdmin) {
         return departmentsAdminService.insertUpdate(departmentsAdmin);
     }
 
@@ -101,9 +83,12 @@ public class DepartmentsAdminController {
     @ResponseBody
     @PostMapping("/login")
     public Response departmentsAdminLogin(HttpServletRequest request, HttpServletResponse response) {
-        Enumeration<String> parameterNames = request.getParameterNames();
-
-        return departmentsAdminService.departmentsAdminLogin(null);
+        String username = (String) request.getAttribute("username");
+        String password = (String) request.getAttribute("password");
+        DepartmentsAdmin admin = new DepartmentsAdmin();
+        admin.setUsername(username);
+        admin.setPassword(password);
+        return departmentsAdminService.departmentsAdminLogin(admin);
     }
 
 
@@ -114,15 +99,14 @@ public class DepartmentsAdminController {
      *
      * @api {put} /departmentsAdmin  医生更新
      * @apiGroup admin
-     * @apiParam  {String} id
+     * @apiParam  {Integer} id
      * @apiParam  {String} username 用户名
      * @apiParam  {String} password 密码
-     * @apiParam  {String} role 角色   0-管理员， 1-医生
      * @apiParam  {String} sectionId 科室id
      */
     @ResponseBody
     @PutMapping
-    public Response departmentsAdminUpdate(@RequestBody @Valid DepartmentsAdmin departmentsAdmin) {
+    public Response departmentsAdminUpdate(@RequestBody @Valid DepartmentsAdminDTO departmentsAdmin) {
         return departmentsAdminService.insertUpdate(departmentsAdmin);
     }
 
@@ -133,11 +117,11 @@ public class DepartmentsAdminController {
      *
      * @api {get} /departmentsAdmin/{id}    查询
      * @apiGroup admin
-     * @apiParam  {String} id
+     * @apiParam  {Integer} id
      */
     @ResponseBody
     @GetMapping("/{id}")
-    public Response departmentsAdminUpdate(@PathVariable Integer id) {
+    public Response departmentsAdmin(@PathVariable Integer id) {
         return departmentsAdminService.selectAdmin(id);
     }
 
@@ -146,13 +130,13 @@ public class DepartmentsAdminController {
      * @param id  实体ID
      * @return repsonse
      *
-     * @api {delete} /departmentsAdmin/{id}    删除
+     * @api {get} /departmentsAdmin/delete/{id}    删除
      * @apiGroup admin
-     * @apiParam  {String} id
+     * @apiParam  {Integer} id
      */
     @ResponseBody
-    @DeleteMapping("/{id}")
-    public Response departmentsAdminDelete(@PathVariable Long id){
+    @GetMapping("/delete/{id}")
+    public Response departmentsAdminDelete(@PathVariable Integer id){
         Boolean flag = departmentsAdminService.deleteById(id);
         return Response.ok(flag);
     }
@@ -161,7 +145,9 @@ public class DepartmentsAdminController {
      * 查询全部
      * @param
      * @return repsonse
-      *
+     *
+     * @api {get} /departmentsAdmin    查询全部
+     * @apiGroup admin
      */
     @ResponseBody
     @GetMapping

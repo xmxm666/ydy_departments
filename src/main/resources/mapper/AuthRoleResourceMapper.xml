@@ -86,6 +86,12 @@
   </update>
   <delete id="deleteByUniqueKey">
     delete from auth_role_resource
-    where role_id = #{roleId,jdbcType=INTEGER} and resource_id = #{resourceId,jdbcType=INTEGER}
+    where 1 = 1
+    <if test="roleId != null">
+      and role_id = #{roleId,jdbcType=INTEGER}
+    </if>
+    <if test="resourceId != null">
+      and resource_id = #{resourceId,jdbcType=INTEGER}
+    </if>
   </delete>
 </mapper>

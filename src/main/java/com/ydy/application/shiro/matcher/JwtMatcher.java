@@ -25,8 +25,7 @@ public class JwtMatcher implements CredentialsMatcher {
         String jwt = (String) authenticationInfo.getCredentials();
         AuthTokenDTO jwtAccount = null;
         try{
-//            jwtAccount = AuthTokenUtil.parseJwt(jwt);
-            jwtAccount = new AuthTokenDTO();
+            jwtAccount = AuthTokenUtil.parseJwt(jwt);
         } catch(SignatureException | UnsupportedJwtException | MalformedJwtException | IllegalArgumentException e){
             // 令牌错误
             throw new AuthenticationException("errJwt");

@@ -35,6 +35,25 @@ public class AuthTokenUtil {
 			return null;
 		}
 	}
+
+	/**
+	 * 验签JWT
+	 *
+	 * @param token json web token
+	 */
+    public static AuthTokenDTO parseJwt(String token) {
+        Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token.replace(BEARER, "")).getBody();
+		AuthTokenDTO jwtAccount = new AuthTokenDTO();
+
+		String userName = null == claims.get("username") ? null : (String) claims.get("username");
+		String roles = null == claims.get("roles") ? null : (String) claims.get("roles");
+		Integer sectionId = null == claims.get("sectionId") ? null : (Integer) claims.get("sectionId");
+
+		jwtAccount.setUserName(userName);
+		jwtAccount.setRoles(roles);
+		jwtAccount.setSectionId(sectionId);
+        return jwtAccount;
+    }
 	
 	public static void main(String[] args) {
 		String str = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJwaG9uZSI6IjE3NjEyMTY3MjI5IiwicmVnaXN0ZXJUaW1lIjoxNTQyMDE2MjYzMDAwLCJhY2NvdW50Tm8iOiJHTTIwMTgxMTEyMTc1MTAzMDAxMDI1Iiwic2V4IjoiMSIsIm5ld09sZEZsYWciOiIwIiwicGxhdFR5cGUiOiIwIiwiZXhwIjoxNTQ2MTMzMDg2LCJ1c2VySWQiOiI1NDAiLCJhZ2UiOjM4fQ.RRGPsZAvwf5FpM4GP6PqZeZExjxo0nKuAtKJm6a0pWjYm4LxjeyYaVhC6H-XmBYhettBSxv2UAJO3cAFP5tlDg";

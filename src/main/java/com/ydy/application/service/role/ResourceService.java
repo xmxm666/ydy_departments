@@ -1,103 +1,37 @@
 package com.ydy.application.service.role;
 
+import com.baomidou.mybatisplus.service.IService;
 import com.ydy.application.entity.role.AuthResource;
+import com.ydy.application.util.Response;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  */
-public interface ResourceService {
+public interface ResourceService extends IService<AuthResource> {
 
     /**
-     * description TODO
-     *
-     * @param appId 1
-     * @return java.util.List<com.usthe.bootshiro.domain.bo.AuthResource>
+     * @param uid
      */
-    List<AuthResource> getAuthorityMenusByUid(String appId);
+    Response getAuthorityMenusByUid(Integer uid);
 
     /**
-     * description TODO
-     *
      * @return java.util.List<com.usthe.bootshiro.domain.bo.AuthResource>
      */
     List<AuthResource> getMenus();
 
     /**
-     * description TODO
-     *
      * @param menu 1
      * @return java.lang.Boolean
      */
-    Boolean addMenu(AuthResource menu);
+    Response addMenu(AuthResource menu);
 
     /**
-     * description TODO
-     *
-     * @param menu 1
-     * @return java.lang.Boolean
-     */
-    Boolean modifyMenu(AuthResource menu);
-
-    /**
-     * description TODO
-     *
      * @param menuId 1
      * @return java.lang.Boolean
      */
-    Boolean deleteMenuByMenuId(Integer menuId);
+    Response deleteMenuByMenuId(Integer menuId);
 
-
-    /**
-     * description TODO
-     *
-     * @return java.util.List<com.usthe.bootshiro.domain.bo.AuthResource>
-     */
-    List<AuthResource> getApiTeamList();
-
-    /**
-     * description TODO
-     *
-     * @return java.util.List<com.usthe.bootshiro.domain.bo.AuthResource>
-     */
-    List<AuthResource> getApiList();
-
-    /**
-     * description TODO
-     *
-     * @param teamId 1
-     * @return java.util.List<com.usthe.bootshiro.domain.bo.AuthResource>
-     */
-    List<AuthResource> getApiListByTeamId(Integer teamId);
-
-    /**
-     * description TODO
-     *
-     * @param roleId 1
-     * @return java.util.List<com.usthe.bootshiro.domain.bo.AuthResource>
-     */
-    List<AuthResource> getAuthorityApisByRoleId(Integer roleId);
-
-    /**
-     * description TODO
-     *
-     * @param roleId 1
-     * @return java.util.List<com.usthe.bootshiro.domain.bo.AuthResource>
-     */
-    List<AuthResource> getAuthorityMenusByRoleId(Integer roleId);
-
-    /**
-     * description TODO
-     *
-     * @param roleId 1
-     * @return java.util.List<com.usthe.bootshiro.domain.bo.AuthResource>
-     */
-    List<AuthResource> getNotAuthorityApisByRoleId(Integer roleId);
-
-    /**
-     * description TODO
-     *
-     * @param roleId 1
-     * @return java.util.List<com.usthe.bootshiro.domain.bo.AuthResource>
-     */
-    List<AuthResource> getNotAuthorityMenusByRoleId(Integer roleId);
+    Response selectPageList(Map<String, Object> queryInfo);
 }

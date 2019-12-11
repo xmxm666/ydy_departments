@@ -1,30 +1,18 @@
 package com.ydy.application.controller.department;
 
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import com.alibaba.fastjson.JSONObject;
-import com.ydy.application.util.PageDTO;
-import org.apache.http.protocol.HTTP;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.ydy.application.entity.department.DepartmentsSection;
 import com.ydy.application.service.department.DepartmentsSectionService;
 import com.ydy.application.util.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Map;
 
 /**
  *  科室
@@ -74,10 +62,7 @@ public class DepartmentsSectionController {
     @ResponseBody
     @PostMapping
     public Response departmentsSectionInsert(@RequestBody @Valid DepartmentsSection departmentsSection) {
-    	departmentsSection.setCreatTime(new Date());
-    	departmentsSection.setIsDeleted(0);
-        departmentsSectionService.insert(departmentsSection);
-        return Response.ok(departmentsSection.getId());
+        return departmentsSectionService.addSection(departmentsSection);
     }
 
 	/**
@@ -94,8 +79,7 @@ public class DepartmentsSectionController {
     @ResponseBody
     @PutMapping
     public Response departmentsSectionUpdate(@RequestBody @Valid DepartmentsSection departmentsSection) {
-		Boolean flag = departmentsSectionService.updateById(departmentsSection);
-        return Response.ok(flag);
+        return departmentsSectionService.addSection(departmentsSection);
     }
 	
 	/**
@@ -119,18 +103,14 @@ public class DepartmentsSectionController {
      * @param id  实体ID
      * @return repsonse
      *
-     * @api {delete} /departmentsSection/{id}   删除
+     * @api {get} /departmentsSection/delete/{id}   删除
      * @apiGroup section
      * @apiParam  {Number} id
      */
     @ResponseBody 
-    @DeleteMapping("/{id}")
+    @GetMapping("/delete/{id}")
     public Response departmentsSectionDelete(@PathVariable Integer id){
-        DepartmentsSection section = new DepartmentsSection();
-        section.setId(id);
-        section.setIsDeleted(1);
-        Boolean flag = departmentsSectionService.updateById(section);
-        return Response.ok(flag);
+        return departmentsSectionService.deleteSection(id);
     }
 	
 	 /**
@@ -149,14 +129,16 @@ public class DepartmentsSectionController {
      * @param hospitalId  实体ID
      * @return repsonse
      *
-     * @api {get} /departmentsSection/hospital/{hospitalId}  查找
+     * @api {get} /departmentsSection/hospital 查找
      * @apiGroup section
      * @apiParam  {Number} hospitalId 医院id
      */
     @ResponseBody
-    @GetMapping("/hospital/{hospitalId}")
-    public Response selectByHospital(@PathVariable Integer hospitalId) {
-        List<DepartmentsSection> list = departmentsSectionService.selectList(new EntityWrapper<DepartmentsSection>().eq("hospital_id", hospitalId));
+    @GetMapping("/hospital")
+    public Response selectByHospital(@RequestParam Integer hospitalId) {
+        List<DepartmentsSection> list = departmentsSectionService.selectList(new EntityWrapper<DepartmentsSection>()
+                .eq("hospital_id", hospitalId)
+                .eq("is_deleted", "0"));
         return Response.ok(list);
     }
     

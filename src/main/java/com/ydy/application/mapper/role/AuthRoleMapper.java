@@ -1,13 +1,16 @@
 package com.ydy.application.mapper.role;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.ydy.application.entity.role.AuthRole;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.dao.DataAccessException;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  */
-public interface AuthRoleMapper {
+public interface AuthRoleMapper extends BaseMapper<AuthRole> {
     /**
      * description TODO
      *
@@ -16,15 +19,6 @@ public interface AuthRoleMapper {
      * @throws DataAccessException when
      */
     int deleteByPrimaryKey(Integer id) throws DataAccessException;
-
-    /**
-     * description TODO
-     *
-     * @param record 1
-     * @return int
-     * @throws DataAccessException when
-     */
-    int insert(AuthRole record) throws DataAccessException;
 
     /**
      * description TODO
@@ -63,9 +57,19 @@ public interface AuthRoleMapper {
     int updateByPrimaryKey(AuthRole record) throws DataAccessException;
 
     /**
-     * description TODO
      * @return java.util.List<AuthRole>
      * @throws DataAccessException when
      */
     List<AuthRole> selectRoles() throws DataAccessException;
+
+    /**
+     * 获取用户角色列表
+     */
+    String selectUserRoles(@Param("userId") Integer userId) ;
+
+    Integer getCount(@Param("map") Map<String, Object> queryInfo);
+
+    List<AuthRole> getPageList(@Param("map") Map<String, Object> queryInfo);
+
+    AuthRole selectByCode(String code);
 }

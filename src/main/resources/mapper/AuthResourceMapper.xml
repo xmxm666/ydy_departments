@@ -15,7 +15,7 @@
         <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
     <sql id="Base_Column_List">
-    ID, CODE, NAME, PARENT_ID, URI, TYPE, METHOD, ICON, STATUS, CREATE_TIME, UPDATE_TIME
+    ID, CODE, NAME, PARENT_ID, URI, TYPE, METHOD, ICON, STATUS, CREATE_TIME, UPDATE_TIME, ROUTER
   </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         select
@@ -27,17 +27,17 @@
     delete from auth_resource
     where ID = #{id,jdbcType=INTEGER}
   </delete>
-    <insert id="insert" keyColumn="ID" keyProperty="id" parameterType="com.ydy.application.entity.role.AuthResource"
+    <!--<insert id="insert" keyColumn="ID" keyProperty="id" parameterType="com.ydy.application.entity.role.AuthResource"
             useGeneratedKeys="true">
-    insert into auth_resource (CODE, NAME, PARENT_ID, 
-      URI, TYPE, METHOD, 
-      ICON, STATUS, CREATE_TIME, 
+    insert into auth_resource (CODE, NAME, PARENT_ID,
+      URI, TYPE, METHOD,
+      ICON, STATUS, CREATE_TIME,
       UPDATE_TIME)
-    values (#{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{parentId,jdbcType=INTEGER}, 
-      #{uri,jdbcType=VARCHAR}, #{type,jdbcType=SMALLINT}, #{method,jdbcType=VARCHAR}, 
-      #{icon,jdbcType=VARCHAR}, #{status,jdbcType=SMALLINT}, #{createTime,jdbcType=TIMESTAMP}, 
+    values (#{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{parentId,jdbcType=INTEGER},
+      #{uri,jdbcType=VARCHAR}, #{type,jdbcType=SMALLINT}, #{method,jdbcType=VARCHAR},
+      #{icon,jdbcType=VARCHAR}, #{status,jdbcType=SMALLINT}, #{createTime,jdbcType=TIMESTAMP},
       #{updateTime,jdbcType=TIMESTAMP})
-  </insert>
+  </insert>-->
     <insert id="insertSelective" keyColumn="ID" keyProperty="id"
             parameterType="com.ydy.application.entity.role.AuthResource" useGeneratedKeys="true">
         insert into auth_resource
@@ -62,6 +62,9 @@
             </if>
             <if test="icon != null">
                 ICON,
+            </if>
+            <if test="router != null">
+                ROUTER,
             </if>
             <if test="status != null">
                 STATUS,
@@ -144,85 +147,67 @@
     </update>
     <update id="updateByPrimaryKey" parameterType="com.ydy.application.entity.role.AuthResource">
     update auth_resource
-    set CODE = #{code,jdbcType=VARCHAR},
-      NAME = #{name,jdbcType=VARCHAR},
-      PARENT_ID = #{parentId,jdbcType=INTEGER},
-      URI = #{uri,jdbcType=VARCHAR},
-      TYPE = #{type,jdbcType=SMALLINT},
-      METHOD = #{method,jdbcType=VARCHAR},
-      ICON = #{icon,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=SMALLINT},
-      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
-      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+    <set>
+        CODE = #{code,jdbcType=VARCHAR},
+        NAME = #{name,jdbcType=VARCHAR},
+        PARENT_ID = #{parentId,jdbcType=INTEGER},
+        URI = #{uri,jdbcType=VARCHAR},
+        TYPE = #{type,jdbcType=SMALLINT},
+        METHOD = #{method,jdbcType=VARCHAR},
+        ICON = #{icon,jdbcType=VARCHAR},
+        ROUTER = #{router,jdbcType=VARCHAR},
+        <if test="status != null">
+            STATUS = #{status,jdbcType=SMALLINT},
+        </if>
+    </set>
     where ID = #{id,jdbcType=INTEGER}
   </update>
 
+    <!--url=jwt[角色1、角色2、角色n]-->
     <select id="selectRoleRules" resultType="com.ydy.application.shiro.rule.RolePermRule">
     select  CONCAT(re.URI, "==",UCASE(re.method)) as url,GROUP_CONCAT(rol.CODE ORDER BY re.URI) as needRoles
     from auth_resource re
     LEFT JOIN auth_role_resource ro on re.id = ro.RESOURCE_ID
     LEFT JOIN auth_role rol on ro.ROLE_ID = rol.ID
-    where re.type = 2
+    where re.type = 2 or re.type = 3
     GROUP BY
     re.URI,re.ID
   </select>
 
-    <select id="selectAuthorityMenusByUid" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select distinct d.* from auth_user a
-    join auth_user_role b on a.uid = b.user_id
-    join auth_role_resource c on b.role_id = c.role_id
-    join auth_resource d on c.resource_id = d.id
-    where a.uid = #{uid,jdbcType=VARCHAR} and d.type = 1 and d.status = 1
-  </select>
+    <select id="selectAuthorityMenusByUid" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select distinct d.* from departments_admin a
+        join auth_user_role b on a.id = b.user_id
+        join auth_role_resource c on b.role_id = c.role_id
+        join auth_resource d on c.resource_id = d.id
+        where a.id = #{uid} and d.type = 2 and d.status = 1
+    </select>
 
     <select id="selectMenus" resultMap="BaseResultMap">
-        select a.* from auth_resource a
-        where a.type = 1
+        select a.* from auth_resource a where a.status = 1
     </select>
 
-    <select id="selectApiTeamList" resultMap="BaseResultMap">
-        select * from auth_resource a
-        where a.type = 3
-    </select>
-
-    <select id="selectApiList" resultMap="BaseResultMap">
-        select a.* from auth_resource a
-        where a.type = 2
-    </select>
-
-    <select id="selectApiListByTeamId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        select a.* from auth_resource a
-        where a.parent_id = #{teamId,jdbcType=INTEGER} and a.type in (2,3)
-    </select>
-
-    <select id="selectApisByRoleId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        select distinct a.* from auth_resource a
-        join auth_role_resource b on a.id = b.resource_id
-        where b.role_id = #{roleId,jdbcType=INTEGER} and a.type = 2
-    </select>
 
     <select id="selectMenusByRoleId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         select distinct a.* from auth_resource a
         join auth_role_resource b on a.id = b.resource_id
-        where b.role_id = #{roleId,jdbcType=INTEGER} and a.type = 1
+        where b.role_id = #{roleId,jdbcType=INTEGER}
     </select>
 
-    <select id="selectNotAuthorityApisByRoleId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        select a.*
-        from auth_resource a
-        where a.type = 2 and not exists (
-          select 1 from auth_role_resource b
-		  where a.id = b.resource_id and b.role_id = #{roleId,jdbcType=INTEGER}
-		)
+    <select id="getCount" resultType="java.lang.Integer">
+		select count(1) from auth_resource where status = 1
+	</select>
+
+    <select id="getPageList" resultType="com.ydy.application.entity.role.AuthResource">
+        select *
+        from auth_resource
+        where status = 1
+        <if test="map.offset != null and map.offset > 0">
+            limit #{map.limit} , #{map.offset}
+        </if>
     </select>
 
-    <select id="selectNotAuthorityMenusByRoleId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        select a.*
-        from auth_resource a
-        where a.type = 1 and not exists (
-          select 1 from auth_role_resource b
-		  where a.id = b.resource_id and b.role_id = #{roleId,jdbcType=INTEGER}
-		)
-    </select>
+    <select id="getParendId" resultType="java.lang.Integer">
+		select count(1) from auth_resource where PARENT_ID = #{pid}
+	</select>
 
 </mapper>

@@ -1,21 +1,39 @@
 package com.ydy.application.entity.role;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.IdType;
+
+import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  *   角色
  */
-public class AuthRole {
+@TableName("auth_role")
+public class AuthRole extends Model<AuthRole> {
+
+    @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
 
+    @NotBlank(message = "CODE不能为空")
+    @TableField("CODE")
     private String code;
 
+    @NotBlank(message = "角色名称不能为空")
+    @TableField("NAME")
     private String name;
 
+    @TableField("STATUS")
     private Short status;
 
+    @TableField("CREATE_TIME")
     private Date createTime;
 
+    @TableField("UPDATE_TIME")
     private Date updateTime;
 
     public Integer getId() {
@@ -64,5 +82,10 @@ public class AuthRole {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return null;
     }
 }

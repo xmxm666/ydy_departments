@@ -3,18 +3,14 @@ package com.ydy.application.controller.department;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.ydy.application.entity.department.DepartmentsAdmin;
 import com.ydy.application.entity.department.DepartmentsHospital;
-import com.ydy.application.filter.AuthTokenDTO;
 import com.ydy.application.service.department.DepartmentsHospitalService;
-import com.ydy.application.token.ContextHolder;
 import com.ydy.application.util.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +40,7 @@ public class DepartmentsHospitalController {
      */
     @ResponseBody
     @PostMapping("/page")
-    public Response getDepartmentsRoomList(@RequestBody JSONObject json) {
+    public Response getList(@RequestBody JSONObject json) {
         Map<String,Object> queryInfo = (Map) json;
         queryInfo.put("limit", (json.getInteger("currPage")-1)*json.getInteger("pageSize"));
         queryInfo.put("offset",json.getInteger("pageSize"));
@@ -58,9 +54,8 @@ public class DepartmentsHospitalController {
      */
     @ResponseBody
     @PostMapping
-    public Response departmentsAdminInsert(@RequestBody DepartmentsHospital departmentsHospital) {
-        Boolean flag = departmentsHospitalService.insert(departmentsHospital);
-        return Response.ok(flag);
+    public Response departmentsHospitalInsert(@RequestBody @Valid DepartmentsHospital departmentsHospital) {
+        return departmentsHospitalService.addHospital(departmentsHospital);
     }
 
 	/**
@@ -69,10 +64,9 @@ public class DepartmentsHospitalController {
      * @return repsonse
      */
     @ResponseBody
-    @PutMapping("/{id}")
-    public Response departmentsAdminUpdate(@RequestBody DepartmentsHospital departmentsHospital) {
-		Boolean flag = departmentsHospitalService.updateById(departmentsHospital);
-        return Response.ok(flag);
+    @PutMapping
+    public Response departmentsHospitalUpdate(@RequestBody DepartmentsHospital departmentsHospital) {
+        return departmentsHospitalService.addHospital(departmentsHospital);
     }
 	
 	/**
@@ -82,7 +76,7 @@ public class DepartmentsHospitalController {
      */
     @ResponseBody
     @GetMapping("/{id}")
-    public Response departmentsAdminUpdate(@PathVariable Integer id) {
+    public Response departmentsHospitalUpdate(@PathVariable Integer id) {
         DepartmentsHospital result = departmentsHospitalService.selectById(id);
         return Response.ok(result);
     }
@@ -93,10 +87,9 @@ public class DepartmentsHospitalController {
      * @return repsonse
      */
     @ResponseBody
-    @DeleteMapping("/{id}")
-    public Response departmentsAdminDelete(@PathVariable Integer id){
-        Boolean flag = departmentsHospitalService.deleteById(id);
-        return Response.ok(flag);
+    @GetMapping("/delete/{id}")
+    public Response departmentsHospitalDelete(@PathVariable Integer id){
+        return departmentsHospitalService.deleteHospital(id);
     }
 	
 	 /**
@@ -106,7 +99,7 @@ public class DepartmentsHospitalController {
      */
     @ResponseBody
     @GetMapping
-    public Response departmentsAdminAll(){
+    public Response departmentsHospitalAll(){
         List<DepartmentsHospital> list = departmentsHospitalService.selectList(new EntityWrapper<DepartmentsHospital>().eq("1", "1"));
         return Response.ok(list);
     }

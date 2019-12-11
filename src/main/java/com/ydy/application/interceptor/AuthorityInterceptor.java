@@ -29,19 +29,19 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		String token = request.getHeader("token"); // 从前台的 header中拿token
-		log.info("PreRequestFilter.token:" + token);
-		String url = request.getRequestURL().toString();
-		boolean urlFlag = NOT_AUTH_URL.isUrlCotainsAnyCode(url);
-		log.info("authFlag =============:0" + urlFlag);
-		if (!urlFlag) {
-			// 校验token
-			if (StringUtils.isBlank(token)) {
-				log.info("token为空，禁止访问!");
-				response.setStatus(401);
-				response.getWriter().write("未认证");
-				return false;
-			}
-		}
+//		log.info("PreRequestFilter.token:" + token);
+//		String url = request.getRequestURL().toString();
+//		boolean urlFlag = NOT_AUTH_URL.isUrlCotainsAnyCode(url);
+//		log.info("authFlag =============:0" + urlFlag);
+//		if (!urlFlag) {
+//			// 校验token
+//			if (StringUtils.isBlank(token)) {
+//				log.info("token为空，禁止访问!");
+//				response.setStatus(401);
+//				response.getWriter().write("未认证");
+//				return false;
+//			}
+//		}
 		//解析token
 		String ip = null;
 		log.info("cloud request context filter inited");
@@ -54,32 +54,15 @@ public class AuthorityInterceptor extends HandlerInterceptorAdapter {
 
 			AuthTokenDTO ctx = new AuthTokenDTO();
 			String platType = null == claims.get("platType") ? null : (String) claims.get("platType");
+			String userName = null == claims.get("username") ? null : (String) claims.get("username");
 			Integer userId = null == claims.get("userId") ? null : (Integer) claims.get("userId");
-			String accountNo = null == claims.get("accountNo") ? null : (String) claims.get("accountNo");
-			String userName = null == claims.get("userName") ? null : (String) claims.get("userName");
-			Long registerTime = null == claims.get("registerTime") ? null : (Long) claims.get("registerTime");
-			ctx.setUserId(userId);
-			ctx.setPlatType(platType);
-			ctx.setAccountNo(accountNo);
 			ctx.setUserName(userName);
+			ctx.setUserId(userId);
 			//ctx.setRegisterTime(new Date(registerTime));
 			if (PLAT_TYPE.DEPARTMENT_ADMIN.getCode().equals(platType)) {
 				Integer sectionId = null == claims.get("section_id") ? null : (Integer) claims.get("section_id");
 				ctx.setSectionId(sectionId);
-			} else if (PLAT_TYPE.JXC.getCode().equals(platType)) {
-				String mechantNo = null == claims.get("mechantNo") ? null : (String) claims.get("mechantNo");
-				ctx.setMechantNo(mechantNo);
 			}
-			
-			log.info("注册时间============", registerTime);
-			// ctx.setRegisterTime(new Date(getHeaderLong(request, "registerTime")));
-			ctx.setAccessToken(request.getHeader("token"));
-
-//			if (StringUtils.isNotBlank(userName)){
-//				ctx.setUserName(URLEncoder.encode(userName,"UTF-8"));
-//			}else{
-//				ctx.setUserName(userName);
-//			}
 			ContextHolder.set(ctx);
 			log.info("*******************操作上下文已设置：{}*******************", JSON.toJSONString(ctx)
 					+ "*********url******" + request.getRequestURL().toString() + "********ip******" + ip);

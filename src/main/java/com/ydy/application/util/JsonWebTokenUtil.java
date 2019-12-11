@@ -139,33 +139,7 @@ public class JsonWebTokenUtil {
         return payload;
     }
 
-    /**
-     * 验签JWT
-     *
-     * @param jwt json web token
-     */
-//    public static JwtAccount parseJwt(String jwt, String appKey) throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException {
-//        Claims claims = Jwts.parser()
-//                .setSigningKey(DatatypeConverter.parseBase64Binary(appKey))
-//                .parseClaimsJws(jwt)
-//                .getBody();
-//        JwtAccount jwtAccount = new JwtAccount();
-//        //令牌ID
-//        jwtAccount.setTokenId(claims.getId());
-//        // 客户标识
-//        jwtAccount.setAppId(claims.getSubject());
-//        // 签发者
-//        jwtAccount.setIssuer(claims.getIssuer());
-//        // 签发时间
-//        jwtAccount.setIssuedAt(claims.getIssuedAt());
-//        // 接收方
-//        jwtAccount.setAudience(claims.getAudience());
-//        // 访问主张-角色
-//        jwtAccount.setRoles(claims.get("roles", String.class));
-//        // 访问主张-权限
-//        jwtAccount.setPerms(claims.get("perms", String.class));
-//        return jwtAccount;
-//    }
+
 
 
     /**

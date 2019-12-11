@@ -3,6 +3,7 @@ package com.ydy.application.service.department;
 import com.baomidou.mybatisplus.service.IService;
 import com.ydy.application.entity.department.DepartmentsHospital;
 import com.ydy.application.util.PageDTO;
+import com.ydy.application.util.Response;
 
 import java.util.Map;
 
@@ -16,6 +17,9 @@ import java.util.Map;
  */
 public interface DepartmentsHospitalService extends IService<DepartmentsHospital> {
 
-
 	PageDTO selectPageList(Map<String, Object> queryInfo);
+
+	Response addHospital(DepartmentsHospital hospital);
+
+	Response deleteHospital(Integer id);
 }

@@ -9,18 +9,15 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-
 @Slf4j
 @ControllerAdvice
-public class CommonExceptionHandler {
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public Response exceptionHandler(Exception e)
     {
+        e.printStackTrace();
         log.error("系统错误:" + e.getMessage());
         return Response.returnCode(ReturnCode.SERVICE_UNAVAILABLE);
     }
@@ -37,7 +34,7 @@ public class CommonExceptionHandler {
     public Response exceptionHandler(MethodArgumentNotValidException e)
     {
         log.info("参数为空:" + e.getMessage());
-        return Response.returnCode("401", e.getBindingResult().getFieldError().getDefaultMessage());
+        return Response.returnCode("412", e.getBindingResult().getFieldError().getDefaultMessage());
     }
 
 }

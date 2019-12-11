@@ -5,10 +5,8 @@ import com.alibaba.fastjson.JSON;
 import com.ydy.application.Enum.ReturnCode;
 import com.ydy.application.service.department.DepartmentsAdminService;
 import com.ydy.application.shiro.token.JwtToken;
-import com.ydy.application.util.IpUtil;
-import com.ydy.application.util.JsonWebTokenUtil;
-import com.ydy.application.util.RequestResponseUtil;
-import com.ydy.application.util.Response;
+import com.ydy.application.util.*;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -125,24 +123,21 @@ public class BonJwtFilter extends AbstractPathMatchingFilter {
         return false;
     }
 
-    private boolean isJwtSubmission(ServletRequest request) {
-
-        String jwt = RequestResponseUtil.getHeader(request,"authorization");
-        String appId = RequestResponseUtil.getHeader(request,"appId");
-        return (request instanceof HttpServletRequest)
-                && !StringUtils.isEmpty(jwt)
-                && !StringUtils.isEmpty(appId);
+    private boolean isJwtSubmission(ServletRequest servletRequest) {
+        if(servletRequest instanceof HttpServletRequest) {
+            HttpServletRequest request = (HttpServletRequest) servletRequest;
+            String jwt = request.getHeader("token");
+            return !StringUtils.isEmpty(jwt);
+        }
+        return false;
     }
 
-    private AuthenticationToken createJwtToken(ServletRequest request) {
-
-        Map<String,String> maps = RequestResponseUtil.getRequestHeaders(request);
-        String appId = maps.get("appId");
-        String ipHost = request.getRemoteAddr();
-        String jwt = maps.get("authorization");
-        String deviceInfo = maps.get("deviceInfo");
-
-        return new JwtToken(ipHost,deviceInfo,jwt,appId);
+    private AuthenticationToken createJwtToken(ServletRequest servletRequest) {
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        String jwt = request.getHeader("token");
+        Claims claims = AuthTokenUtil.parserJavaWebToken(jwt);
+        String userName = null == claims.get("username") ? null : (String) claims.get("username");
+        return new JwtToken(userName, jwt);
     }
 
     /**

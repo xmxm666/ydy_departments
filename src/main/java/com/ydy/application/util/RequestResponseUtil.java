@@ -2,17 +2,18 @@ package com.ydy.application.util;
 
 
 import com.alibaba.fastjson.JSON;
-import com.ydy.application.support.XssSqlHttpServletRequestWrapper;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,25 +24,6 @@ public class RequestResponseUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestResponseUtil.class);
     private static final String STR_BODY = "body";
-
-    /**
-     * description 取request中的已经被防止XSS，SQL注入过滤过的key value数据封装到map 返回
-     *
-     * @param request 1
-     * @return java.util.Map<java.lang.String,java.lang.String>
-     */
-    public static Map<String,String> getRequestParameters(ServletRequest request) {
-        Map<String,String> dataMap = new HashMap<>(16);
-        Enumeration enums = request.getParameterNames();
-        while (enums.hasMoreElements()) {
-            String paraName = (String)enums.nextElement();
-            String paraValue = RequestResponseUtil.getRequest(request).getParameter(paraName);
-            if(null!=paraValue && !"".equals(paraValue)) {
-                dataMap.put(paraName,paraValue);
-            }
-        }
-        return dataMap;
-    }
 
     /**
      * description 获取request中的body json 数据转化为map
@@ -69,51 +51,6 @@ public class RequestResponseUtil {
     }
 
     /**
-     * description 读取request 已经被防止XSS，SQL注入过滤过的 请求参数key 对应的value
-     *
-     * @param request 1
-     * @param key 2
-     * @return java.lang.String
-     */
-    public static String getParameter(ServletRequest request, String key) {
-        return RequestResponseUtil.getRequest(request).getParameter(key);
-    }
-
-    /**
-     * description 读取request 已经被防止XSS，SQL注入过滤过的 请求头key 对应的value
-     *
-     * @param request 1
-     * @param key 2
-     * @return java.lang.String
-     */
-    public static String getHeader(ServletRequest request, String key) {
-        return RequestResponseUtil.getRequest(request).getHeader(key);
-    }
-
-    /**
-     * description 取request头中的已经被防止XSS，SQL注入过滤过的 key value数据封装到map 返回
-     *
-     * @param request 1
-     * @return java.util.Map<java.lang.String,java.lang.String>
-     */
-    public static Map<String,String> getRequestHeaders(ServletRequest request) {
-        Map<String,String> headerMap = new HashMap<>(16);
-        Enumeration enums = RequestResponseUtil.getRequest(request).getHeaderNames();
-        while (enums.hasMoreElements()) {
-            String name = (String) enums.nextElement();
-            String value = RequestResponseUtil.getRequest(request).getHeader(name);
-            if (null != value && !"".equals(value)) {
-                headerMap.put(name,value);
-            }
-        }
-        return headerMap;
-    }
-
-    public static HttpServletRequest getRequest(ServletRequest request) {
-        return new XssSqlHttpServletRequestWrapper((HttpServletRequest) request);
-    }
-
-    /**
      * description 封装response  统一json返回
      *
      * @param outStr 1
@@ -132,7 +69,7 @@ public class RequestResponseUtil {
         }
     }
 
-    public static byte[] getRequestPostBytes(HttpServletRequest request)
+    public static String getRequestPost(HttpServletRequest request)
             throws IOException {
         int contentLength = request.getContentLength();
         if(contentLength<0){
@@ -148,7 +85,27 @@ public class RequestResponseUtil {
             }
             i += readlen;
         }
-        return buffer;
+
+        String charEncoding = request.getCharacterEncoding();
+        if (charEncoding == null) {
+            charEncoding = "UTF-8";
+        }
+        String param = new String(buffer, charEncoding);
+        return param;
+    }
+
+    /**
+     * 为response设置header，实现跨域
+     */
+    public static void setHeader(HttpServletRequest request, HttpServletResponse response){
+        //跨域的header设置
+        response.setHeader("Access-control-Allow-Origin", request.getHeader("Origin"));
+        response.setHeader("Access-Control-Allow-Methods", request.getMethod());
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers"));
+        //防止乱码，适用于传输JSON数据
+        response.setHeader("Content-Type","application/json;charset=UTF-8");
+        response.setStatus(HttpStatus.OK.value());
     }
 
 

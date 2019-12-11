@@ -1,19 +1,33 @@
 package com.ydy.application.entity.role;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.IdType;
+
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  *   role-user
  */
-public class AuthUserRole {
+@TableName("auth_user_role")
+public class AuthUserRole extends Model<AuthUserRole> {
+
+    @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
 
-    private String userId;
+    @TableField("USER_ID")
+    private Integer userId;
 
+    @TableField("ROLE_ID")
     private Integer roleId;
 
+    @TableField("CREATE_TIME")
     private Date createTime;
 
+    @TableField("UPDATE_TIME")
     private Date updateTime;
 
     public Integer getId() {
@@ -24,12 +38,12 @@ public class AuthUserRole {
         this.id = id;
     }
 
-    public String getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId == null ? null : userId.trim();
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public Integer getRoleId() {
@@ -54,5 +68,10 @@ public class AuthUserRole {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return null;
     }
 }

@@ -1,17 +1,15 @@
 package com.ydy.application.entity.department;
 
-import java.io.Serializable;
-
-import com.baomidou.mybatisplus.enums.IdType;
-import java.util.Date;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.IdType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -29,11 +27,11 @@ public class DepartmentsSection extends Model<DepartmentsSection> {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @NotBlank
+    @NotBlank(message = "科室名称不能为空")
     private String name;
 
     @TableField("hospital_id")
-    @NotNull
+    @NotNull(message = "请选择医院")
     private Integer hospitalId;
 
     @TableField("creat_time")

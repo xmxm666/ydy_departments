@@ -16,10 +16,11 @@
     </sql>
 
     <select id="selectAdmin" resultType="com.ydy.application.dto.department.DepartmentsAdminDTO">
-        SELECT a.id, a.username, a.section_id as sectionId, s.`name` as sectionName
+        SELECT a.id, a.username, a.section_id as sectionId, s.`name` as sectionName, h.id as hospitalId
         FROM departments_admin a
         LEFT JOIN departments_section s on a.section_id = s.id
-        WHERE a.id = #{id}
+        LEFT JOIN departments_hospital h on s.hospital_id = h.id
+        WHERE a.id = #{id} and a.is_deleted = 0
     </select>
 
     <select id="getPageListCount" parameterType="java.util.Map" resultType="java.lang.Integer">
@@ -27,10 +28,7 @@
         from departments_admin a
         LEFT JOIN departments_section s on a.section_id = s.id
         LEFT JOIN departments_hospital h on s.hospital_id = h.id
-        WHERE 1=1
-        <if test="role != null">
-            and a.role = #{role}
-        </if>
+        WHERE 1=1 and a.is_deleted = 0
         <if test="sectionId != null">
             and s.id = #{sectionId}
         </if>
@@ -40,23 +38,24 @@
     </select>
 
     <select id="getPageList" parameterType="java.util.Map" resultType="com.ydy.application.dto.department.DepartmentsAdminDTO">
-        select a.id, a.username, a.section_id, s.`name` as sectionName
+        select a.id, a.username, a.section_id, s.`name` as sectionName, h.`name` as hospitalName, a.creat_time as creatTime, GROUP_CONCAT(r.`NAME`) as roles
         from departments_admin a
         LEFT JOIN departments_section s on a.section_id = s.id
         LEFT JOIN departments_hospital h on s.hospital_id = h.id
-        WHERE 1=1
-        <if test="role != null">
-            and a.role = #{role}
-        </if>
+        LEFT JOIN auth_user_role ur on a.id = ur.USER_ID
+        LEFT JOIN auth_role r on ur.ROLE_ID = r.ID
+        WHERE 1=1 and a.is_deleted = 0
         <if test="sectionId != null">
             and s.id = #{sectionId}
         </if>
         <if test="hospitalId != null">
             and h.id = #{hospitalId}
         </if>
+        group by a.id
         <if test="offset != null and offset > 0">
             limit #{limit} , #{offset}
         </if>
+
     </select>
 
 </mapper>

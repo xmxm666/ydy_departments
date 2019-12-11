@@ -1,7 +1,11 @@
 package com.ydy.application.shiro.realm;
 
+import com.ydy.application.filter.AuthTokenDTO;
 import com.ydy.application.shiro.token.JwtToken;
+import com.ydy.application.util.AuthTokenUtil;
+import com.ydy.application.util.JsonUtil;
 import com.ydy.application.util.JsonWebTokenUtil;
+import com.ydy.application.util.RedisUtil;
 import io.jsonwebtoken.MalformedJwtException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -11,6 +15,8 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.Map;
 import java.util.Set;
@@ -21,9 +27,9 @@ import java.util.Set;
 public class JwtRealm extends AuthorizingRealm {
 
     private static final String JWT = "jwt:";
-    private static final int NUM_4 = 4;
-    private static final char LEFT = '{';
-    private static final char RIGHT = '}';
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Override
     public Class<?> getAuthenticationTokenClass() {
@@ -36,19 +42,17 @@ public class JwtRealm extends AuthorizingRealm {
 
         String payload = (String) principalCollection.getPrimaryPrincipal();
         // likely to be json, parse it:
-        if (payload.startsWith(JWT) && payload.charAt(NUM_4) == LEFT
-                && payload.charAt(payload.length() - 1) == RIGHT) {
+        if (payload.startsWith(JWT)) {
+            AuthTokenDTO authTokenDTO = AuthTokenUtil.parseJwt(payload.substring(4));
+            Set<String> roles = JsonUtil.split(authTokenDTO.getRoles());
 
-            Map<String, Object> payloadMap = JsonWebTokenUtil.readValue(payload.substring(4));
-            Set<String> roles = JsonWebTokenUtil.split((String)payloadMap.get("roles"));
-            Set<String> permissions = JsonWebTokenUtil.split((String)payloadMap.get("perms"));
             SimpleAuthorizationInfo info =  new SimpleAuthorizationInfo();
             if(null!=roles&&!roles.isEmpty()) {
                 info.setRoles(roles);
             }
-            if(null!=permissions&&!permissions.isEmpty()) {
-                info.setStringPermissions(permissions);
-            }
+//            if(null!=permissions&&!permissions.isEmpty()) {
+//                info.setStringPermissions(permissions);
+//            }
             return info;
         }
         return null;
@@ -61,22 +65,11 @@ public class JwtRealm extends AuthorizingRealm {
         }
         JwtToken jwtToken = (JwtToken)authenticationToken;
         String jwt = (String)jwtToken.getCredentials();
-        String payload = null;
-        try{
-            // 预先解析Payload
-            // 没有做任何的签名校验
-            payload = JsonWebTokenUtil.parseJwtPayload(jwt);
-        } catch(MalformedJwtException e){
-            //令牌格式错误
-            throw new AuthenticationException("errJwt");
-        } catch(Exception e){
-            //令牌无效
-            throw new AuthenticationException("errsJwt");
-        }
+        String payload = (String)jwtToken.getPrincipal();
         if(null == payload){
             //令牌无效
             throw new AuthenticationException("errJwt");
         }
-        return new SimpleAuthenticationInfo("jwt:"+payload,jwt,this.getName());
+        return new SimpleAuthenticationInfo(JWT + jwt,jwt,this.getName());
     }
 }

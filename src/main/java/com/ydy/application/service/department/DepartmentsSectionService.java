@@ -19,4 +19,7 @@ public interface DepartmentsSectionService extends IService<DepartmentsSection> 
 
     PageDTO selectPageList(Map<String, Object> queryInfo);
 
+    Response addSection(DepartmentsSection departmentsSection);
+
+    Response deleteSection(Integer sectionId);
 }

@@ -12,30 +12,17 @@ public class JwtToken implements AuthenticationToken{
     /**
      * 用户的标识
      */
-    private String appId;
-    /**
-     * 用户的IP
-     */
-    private String ipHost;
-    /**
-     * 设备信息
-     */
-    private String deviceInfo;
-    /**
-     * json web token值
-     */
+    private String userName;
     private String jwt;
 
-    public JwtToken(String ipHost, String deviceInfo, String jwt,String appId) {
-        this.ipHost = ipHost;
-        this.deviceInfo = deviceInfo;
+    public JwtToken(String userName, String jwt) {
+        this.userName = userName;
         this.jwt = jwt;
-        this.appId = appId;
     }
 
     @Override
     public Object getPrincipal() {
-        return this.appId;
+        return this.userName;
     }
 
     @Override
@@ -43,20 +30,12 @@ public class JwtToken implements AuthenticationToken{
         return this.jwt;
     }
 
-    public String getIpHost() {
-        return ipHost;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setIpHost(String ipHost) {
-        this.ipHost = ipHost;
-    }
-
-    public String getDeviceInfo() {
-        return deviceInfo;
-    }
-
-    public void setDeviceInfo(String deviceInfo) {
-        this.deviceInfo = deviceInfo;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getJwt() {
@@ -65,13 +44,5 @@ public class JwtToken implements AuthenticationToken{
 
     public void setJwt(String jwt) {
         this.jwt = jwt;
-    }
-
-    public String getAppId() {
-        return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
     }
 }

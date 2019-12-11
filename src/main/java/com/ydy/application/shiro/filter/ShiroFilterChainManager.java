@@ -4,7 +4,6 @@ package com.ydy.application.shiro.filter;
 import com.ydy.application.service.department.DepartmentsAdminService;
 import com.ydy.application.shiro.config.RestPathMatchingFilterChainResolver;
 import com.ydy.application.shiro.provider.ShiroFilterRulesProvider;
-import com.ydy.application.shiro.rule.RolePermRule;
 import com.ydy.application.support.SpringContextHolder;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
@@ -48,9 +47,6 @@ public class ShiroFilterChainManager {
     public Map<String,Filter> initGetFilters() {
         Map<String,Filter> filters = new LinkedHashMap<>();
 
-        // 注意这里不要用Bean的方式，否则会报错
-        filters.put("authc", new ShiroUserFilter());
-
         PasswordFilter passwordFilter = new PasswordFilter();
         filters.put("auth",passwordFilter);
 
@@ -76,17 +72,17 @@ public class ShiroFilterChainManager {
         List<String> defalutAuth = Arrays.asList("/departmentsAdmin/login");
         defalutAuth.forEach(auth -> filterChain.put(auth,"auth"));
         // -------------dynamic 动态URL
-        if (shiroFilterRulesProvider != null) {
-            List<RolePermRule> rolePermRules = this.shiroFilterRulesProvider.loadRolePermRules();
-            if (null != rolePermRules) {
-                rolePermRules.forEach(rule -> {
-                    StringBuilder chain = rule.toFilterChain();
-                    if (null != chain) {
-                        filterChain.putIfAbsent(rule.getUrl(),chain.toString());
-                    }
-                });
-            }
-        }
+//        if (shiroFilterRulesProvider != null) {
+//            List<RolePermRule> rolePermRules = this.shiroFilterRulesProvider.loadRolePermRules();
+//            if (null != rolePermRules) {
+//                rolePermRules.forEach(rule -> {
+//                    StringBuilder chain = rule.toFilterChain();
+//                    if (null != chain) {
+//                        filterChain.putIfAbsent(rule.getUrl(),chain.toString());
+//                    }
+//                });
+//            }
+//        }
         return filterChain;
     }
     /**

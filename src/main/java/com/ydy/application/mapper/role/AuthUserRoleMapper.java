@@ -1,11 +1,15 @@
 package com.ydy.application.mapper.role;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.ydy.application.entity.role.AuthUserRole;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.dao.DataAccessException;
+
+import java.util.List;
 
 /**
  */
-public interface AuthUserRoleMapper {
+public interface AuthUserRoleMapper  extends BaseMapper<AuthUserRole> {
 
     /**
      * description TODO
@@ -15,24 +19,6 @@ public interface AuthUserRoleMapper {
      * @throws DataAccessException when
      */
     int deleteByPrimaryKey(Integer id) throws DataAccessException;
-
-    /**
-     * description TODO
-     *
-     * @param record 1
-     * @return int
-     * @throws DataAccessException when
-     */
-    int insert(AuthUserRole record) throws DataAccessException;
-
-    /**
-     * description TODO
-     *
-     * @param record 1
-     * @return int
-     * @throws DataAccessException when
-     */
-    int insertSelective(AuthUserRole record) throws DataAccessException;
 
     /**
      * description TODO
@@ -69,4 +55,8 @@ public interface AuthUserRoleMapper {
      * @throws DataAccessException when
      */
     int deleteByUniqueKey(AuthUserRole record) throws DataAccessException;
+
+    List<AuthUserRole> selectByRoleId(@Param("roleId") Integer roleId);
+
+    Integer[] selectByUserId(@Param("userId") Integer userId);
 }

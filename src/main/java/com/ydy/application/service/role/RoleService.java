@@ -1,12 +1,16 @@
 package com.ydy.application.service.role;
 
+import com.baomidou.mybatisplus.service.IService;
+import com.ydy.application.dto.RoleDTO;
 import com.ydy.application.entity.role.AuthRole;
+import com.ydy.application.util.Response;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  */
-public interface RoleService {
+public interface RoleService extends IService<AuthRole> {
 
     /**
      * description TODO
@@ -18,28 +22,16 @@ public interface RoleService {
     boolean authorityRoleResource(int roleId, int resourceId);
 
     /**
-     * description TODO
-     *
      * @param role 1
      * @return boolean
      */
-    boolean addRole(AuthRole role);
+    Response addRole(RoleDTO role);
 
     /**
-     * description TODO
-     *
-     * @param role 1
-     * @return boolean
-     */
-    boolean updateRole(AuthRole role);
-
-    /**
-     * description TODO
-     *
      * @param roleId 1
      * @return boolean
      */
-    boolean deleteRoleByRoleId(Integer roleId);
+    Response deleteRoleByRoleId(Integer roleId);
 
     /**
      * description TODO
@@ -56,4 +48,8 @@ public interface RoleService {
      * @return java.util.List<AuthRole>
      */
     List<AuthRole> getRoleList();
+
+    Response selectPageList(Map<String, Object> queryInfo);
+
+    Response getById(Integer id);
 }

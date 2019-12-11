@@ -99,4 +99,32 @@
   <select id="selectRoles" resultMap="BaseResultMap">
     select * from auth_role
   </select>
+
+  <select id="selectUserRoles" parameterType="java.lang.Integer" resultType="java.lang.String">
+    SELECT GROUP_CONCAT(rol.CODE) AS Roles
+    FROM departments_admin usr
+    JOIN auth_user_role uro ON usr.id = uro.USER_ID
+    JOIN auth_role rol ON uro.ROLE_ID = rol.ID
+    WHERE usr.id = #{userId}
+  </select>
+
+  <select id="getCount" resultType="java.lang.Integer">
+		select count(1) from auth_role where status = 1
+	</select>
+
+  <select id="getPageList" resultType="com.ydy.application.entity.role.AuthRole">
+    select *
+    from auth_role
+    where status = 1
+    <if test="map.offset != null and map.offset > 0">
+      limit #{map.limit} , #{map.offset}
+    </if>
+  </select>
+
+  <select id="selectByCode" resultType="com.ydy.application.entity.role.AuthRole">
+    select *
+    from auth_role
+    where CODE=#{code} and status = 1
+  </select>
+
 </mapper>

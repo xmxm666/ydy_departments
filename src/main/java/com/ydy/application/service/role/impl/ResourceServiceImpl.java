@@ -1,23 +1,28 @@
 package com.ydy.application.service.role.impl;
 
+import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.ydy.application.Enum.ReturnCode;
+import com.ydy.application.dto.MenuTreeNode;
 import com.ydy.application.entity.role.AuthResource;
 import com.ydy.application.mapper.role.AuthResourceMapper;
 import com.ydy.application.service.role.ResourceService;
+import com.ydy.application.util.PageDTO;
+import com.ydy.application.util.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.util.*;
 
 /**
- * @author tomsun28
- * @date 10:59 2018/3/26
+ *
  */
 @Service("ResourceService")
-public class ResourceServiceImpl implements ResourceService {
+public class ResourceServiceImpl extends ServiceImpl<AuthResourceMapper, AuthResource> implements ResourceService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceServiceImpl.class);
 
@@ -25,8 +30,25 @@ public class ResourceServiceImpl implements ResourceService {
     private AuthResourceMapper authResourceMapper;
 
     @Override
-    public List<AuthResource> getAuthorityMenusByUid(String appId) throws DataAccessException {
-        return authResourceMapper.selectAuthorityMenusByUid(appId);
+    public Response getAuthorityMenusByUid(Integer uid) throws DataAccessException {
+        HashMap<Integer, MenuTreeNode> nodeMap = new HashMap<>();
+
+        //获取所有权限资源
+        List<AuthResource> resources = authResourceMapper.selectAuthorityMenusByUid(uid);
+        for (AuthResource resource : resources) {
+            boolean hasParent = nodeMap.containsKey(resource.getParentId());
+            if(!hasParent) {
+                AuthResource parent = baseMapper.selectById(resource.getParentId());
+                MenuTreeNode parentNode = new MenuTreeNode();
+                BeanUtils.copyProperties(parent, parentNode);
+                parentNode.addChilren(resource);
+                nodeMap.put(resource.getParentId(), parentNode);
+            } else {
+                MenuTreeNode parentNode = nodeMap.get(resource.getParentId());
+                parentNode.addChilren(resource);
+            }
+        }
+        return Response.ok(nodeMap.values());
     }
 
     @Override
@@ -35,56 +57,68 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public Boolean addMenu(AuthResource menu) throws DataAccessException {
-        int num = authResourceMapper.insertSelective(menu);
-        return num == 1 ? Boolean.TRUE : Boolean.FALSE;
+    public Response addMenu(AuthResource menu) throws DataAccessException {
+        int type = menu.getType().intValue();
+        if(type == 1) {
+            if(StringUtils.isEmpty(menu.getIcon())) {
+                return Response.returnCode("3004", "ICON不能为空");
+            }
+            if(StringUtils.isEmpty(menu.getRouter())) {
+                return Response.returnCode("3004", "前端路由不能为空");
+            }
+            menu.setParentId(-1);
+        } else if(type == 2 || type == 3) {
+            if(StringUtils.isEmpty(menu.getUri())) {
+                return Response.returnCode("3004", "URI不能为空");
+            }
+            if(StringUtils.isEmpty(menu.getMethod())) {
+                return Response.returnCode("3004", "方法不能为空");
+            }
+            if(menu.getParentId() == null) {
+                return Response.returnCode("3004", "父ID不能为空");
+            }
+            if(type == 2 && StringUtils.isEmpty(menu.getRouter())) {
+                return Response.returnCode("3004", "前端路由不能为空");
+            }
+        }else {
+            return Response.returnCode("3004", "资源类型不存在");
+        }
+        Integer num = 0;
+        if(menu.getId() == null) {
+            menu.setStatus(new Short("1"));
+            menu.setCreateTime(new Date());
+            num = authResourceMapper.insert(menu);
+        } else {
+            num = authResourceMapper.updateByPrimaryKey(menu);
+        }
+        if(num == 1) {
+            return Response.ok();
+        } else {
+            return Response.returnCode(ReturnCode.SAVE_FAIL);
+        }
     }
 
     @Override
-    public Boolean modifyMenu(AuthResource menu) throws DataAccessException {
-        int num = authResourceMapper.updateByPrimaryKeySelective(menu);
-        return num == 1 ? Boolean.TRUE : Boolean.FALSE;
+    public Response deleteMenuByMenuId(Integer menuId) throws DataAccessException {
+        Integer count = authResourceMapper.getParendId(menuId);
+        if(count > 0) {
+            return Response.returnCode("3005","删除失败：请先删除子资源！");
+        }
+        Integer num = authResourceMapper.deleteByPrimaryKey(menuId);
+        if(num == 1) {
+            return Response.ok();
+        } else {
+            return Response.returnCode(ReturnCode.DELETE_FAIL);
+        }
     }
 
     @Override
-    public Boolean deleteMenuByMenuId(Integer menuId) throws DataAccessException {
-        int num = authResourceMapper.deleteByPrimaryKey(menuId);
-        return num == 1 ? Boolean.TRUE : Boolean.FALSE;
-    }
-
-    @Override
-    public List<AuthResource> getApiTeamList() throws DataAccessException {
-        return authResourceMapper.selectApiTeamList();
-    }
-
-    @Override
-    public List<AuthResource> getApiList() throws DataAccessException {
-        return authResourceMapper.selectApiList();
-    }
-
-    @Override
-    public List<AuthResource> getApiListByTeamId(Integer teamId) throws DataAccessException {
-        return authResourceMapper.selectApiListByTeamId(teamId);
-    }
-
-    @Override
-    public List<AuthResource> getAuthorityApisByRoleId(Integer roleId) throws DataAccessException {
-        return authResourceMapper.selectApisByRoleId(roleId);
-    }
-
-    @Override
-    public List<AuthResource> getAuthorityMenusByRoleId(Integer roleId) throws DataAccessException {
-        return authResourceMapper.selectMenusByRoleId(roleId);
-    }
-
-    @Override
-    public List<AuthResource> getNotAuthorityApisByRoleId(Integer roleId) throws DataAccessException {
-        return authResourceMapper.selectNotAuthorityApisByRoleId(roleId);
-    }
-
-    @Override
-    public List<AuthResource> getNotAuthorityMenusByRoleId(Integer roleId) throws DataAccessException {
-        return authResourceMapper.selectNotAuthorityMenusByRoleId(roleId);
+    public Response selectPageList(Map<String, Object> queryInfo) {
+        //总数
+        Integer totalCount = authResourceMapper.getCount(queryInfo);
+        //数据
+        List<AuthResource> list = baseMapper.getPageList(queryInfo);
+        return Response.ok(new PageDTO<>(totalCount, list));
     }
 
 }

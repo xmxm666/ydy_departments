@@ -1,13 +1,14 @@
 package com.ydy.application.controller.role;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.ydy.application.dto.MenuTreeNode;
 import com.ydy.application.entity.role.AuthResource;
 import com.ydy.application.filter.AuthTokenDTO;
 import com.ydy.application.service.role.ResourceService;
 import com.ydy.application.token.ContextHolder;
 import com.ydy.application.util.Response;
-import io.swagger.annotations.ApiOperation;
+import com.ydy.application.util.TreeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -15,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *   资源URL管理
@@ -30,132 +33,135 @@ public class ResourceController {
     @Autowired
     private ResourceService resourceService;
 
-//    @ApiOperation(value = "获取用户被授权菜单",notes = "通过uid获取对应用户被授权的菜单列表,获取完整菜单树形结构")
-//    @GetMapping("authorityMenu")
-//    public Response getAuthorityMenu(HttpServletRequest request) {
-//        AuthTokenDTO authTokenDTO = ContextHolder.get();
-//        Integer uid = authTokenDTO.getUserId();
-//        List<MenuTreeNode> treeNodes = new ArrayList<>();
-//        List<AuthResource> resources = resourceService.getAuthorityMenusByUid(uid);
-//
-//        for (AuthResource resource : resources) {
-//            MenuTreeNode node = new MenuTreeNode();
-//            BeanUtils.copyProperties(resource,node);
-//            treeNodes.add(node);
-//        }
-//        List<MenuTreeNode> menuTreeNodes = TreeUtil.buildTreeBy2Loop(treeNodes,-1);
-//        return new Message().ok(6666,"return menu list success").addData("menuTree",menuTreeNodes);
-//    }
-//
-//    @ApiOperation(value = "获取全部菜单列", httpMethod = "GET")
-//    @GetMapping("menus")
-//    public Message getMenus() {
-//
-//        List<MenuTreeNode> treeNodes = new ArrayList<>();
-//        List<AuthResource> resources = resourceService.getMenus();
-//
-//        for (AuthResource resource: resources) {
-//            MenuTreeNode node = new MenuTreeNode();
-//            BeanUtils.copyProperties(resource,node);
-//            treeNodes.add(node);
-//        }
-//        List<MenuTreeNode> menuTreeNodes = TreeUtil.buildTreeBy2Loop(treeNodes,-1);
-//        return new Message().ok(6666,"return menus success").addData("menuTree",menuTreeNodes);
-//    }
-//
-//    @ApiOperation(value = "增加菜单",httpMethod = "POST")
-//    @PostMapping("menu")
-//    public Message addMenu(@RequestBody AuthResource menu ) {
-//
-//        Boolean flag = resourceService.addMenu(menu);
-//        if (flag) {
-//            return new Message().ok(6666,"add menu success");
-//        } else {
-//            return new Message().error(1111,"add menu fail");
-//        }
-//    }
-//
-//    @ApiOperation(value = "修改菜单",httpMethod = "PUT")
-//    @PutMapping("menu")
-//    public Message updateMenu(@RequestBody AuthResource menu) {
-//
-//        Boolean flag = resourceService.modifyMenu(menu);
-//        if (flag) {
-//            return new Message().ok(6666,"update menu success");
-//        } else {
-//            return new Message().error(1111, "update menu fail");
-//        }
-//    }
-//
-//    @ApiOperation(value = "删除菜单", notes = "根据菜单ID删除菜单", httpMethod = "DELETE")
-//    @DeleteMapping("menu/{menuId}")
-//    public Message deleteMenuByMenuId(@PathVariable Integer menuId) {
-//
-//        Boolean flag = resourceService.deleteMenuByMenuId(menuId);
-//        if (flag) {
-//            return new Message().ok(6666, "delete menu success");
-//        } else {
-//            return new Message().error(1111, "delete menu fail");
-//        }
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    @ApiOperation(value = "获取API list", notes = "需要分页,根据teamId判断,-1->获取api分类,0->获取全部api,id->获取对应分类id下的api",httpMethod = "GET")
-//    @GetMapping("api/{teamId}/{currentPage}/{pageSize}")
-//    public Message getApiList(@PathVariable Integer teamId, @PathVariable Integer currentPage, @PathVariable Integer pageSize) {
-//
-//        List<AuthResource> resources = null;
-//        if (teamId == -1) {
-//            // -1 为获取api分类
-//            resources = resourceService.getApiTeamList();
-//            return new Message().ok(6666,"return apis success").addData("data",resources);
-//        }
-//        PageHelper.startPage(currentPage, pageSize);
-//        if (teamId == 0) {
-//            // 0 为获取全部api
-//            resources = resourceService.getApiList();
-//        } else {
-//            // 其他查询teamId 对应分类下的apis
-//            resources = resourceService.getApiListByTeamId(teamId);
-//        }
-//        PageInfo pageInfo = new PageInfo(resources);
-//        return new Message().ok(6666,"return apis success").addData("data",pageInfo);
-//    }
-//
-//    @ApiOperation(value = "增加API",httpMethod = "POST")
-//    @PostMapping("api")
-//    public Message addApi(@RequestBody AuthResource api ) {
-//
-//        Boolean flag = resourceService.addMenu(api);
-//        if (flag) {
-//            return new Message().ok(6666,"add api success");
-//        } else {
-//            return new Message().error(1111,"add api fail");
-//        }
-//    }
-//
-//    @ApiOperation(value = "修改API",httpMethod = "PUT")
-//    @PutMapping("api")
-//    public Message updateApi(@RequestBody AuthResource api) {
-//
-//        Boolean flag = resourceService.modifyMenu(api);
-//        if (flag) {
-//            return new Message().ok(6666,"update api success");
-//        } else {
-//            return new Message().error(1111, "update api fail");
-//        }
-//    }
-//
-//    @ApiOperation(value = "删除API", notes = "根据API_ID删除API", httpMethod = "DELETE")
-//    @DeleteMapping("api/{apiId}")
-//    public Message deleteApiByApiId(@PathVariable Integer apiId) {
-//
-//        Boolean flag = resourceService.deleteMenuByMenuId(apiId);
-//        if (flag) {
-//            return new Message().ok(6666, "delete api success");
-//        } else {
-//            return new Message().error(1111, "delete api fail");
-//        }
-//    }
+    /**
+     * 分页信息 获取全部资源列
+     * @return repsonse
+     *
+     * @api {post} /resource/page    资源分页信息
+     * @apiGroup resource
+     * @apiParam  {Number} currPage 页数
+     * @apiParam  {Number} pageSize 每页数量
+     */
+    @ResponseBody
+    @PostMapping("/page")
+    public Response getResourceList(@RequestBody JSONObject json) {
+        Map<String,Object> queryInfo = (Map) json;
+        queryInfo.put("limit", (json.getInteger("currPage")-1)*json.getInteger("pageSize"));
+        queryInfo.put("offset",json.getInteger("pageSize"));
+        return resourceService.selectPageList(queryInfo);
+    }
+
+    /**
+     * 新增资源
+     * @param menu  传递的实体
+     * @return repsonse
+     *
+     * @api {post} /resource 新增资源
+     * @apiGroup resource
+     * @apiParam  {String} code CODE
+     * @apiParam  {String} name 资源名称
+     * @apiParam  {Integer} parentId 父ID
+     * @apiParam  {String} uri RUI
+     * @apiParam  {String} method 方法
+     */
+    @PostMapping
+    public Response addMenu(@RequestBody @Valid AuthResource menu ) {
+        return resourceService.addMenu(menu);
+    }
+
+    /**
+     * 修改资源
+     * @param menu  传递的实体
+     * @return repsonse
+     *
+     * @api {put} /resource 新增资源
+     * @apiGroup resource
+     * @apiParam  {Integer} id
+     * @apiParam  {String} code CODE
+     * @apiParam  {String} name 资源名称
+     * @apiParam  {Integer} parentId 父ID
+     * @apiParam  {String} uri RUI
+     * @apiParam  {String} method 方法
+     */
+    @PutMapping
+    public Response updateMenu(@RequestBody AuthResource menu) {
+        return resourceService.addMenu(menu);
+    }
+
+    /**
+     * 根据id删除对象
+     * @param id  实体ID
+     * @return repsonse
+     *
+     * @api {get} /resource/delete/{id}  删除
+     * @apiGroup resource
+     * @apiParam  {String} id
+     */
+    @ResponseBody
+    @GetMapping("/delete/{id}")
+    public Response deleteMenuByMenuId(@PathVariable Integer id) {
+        return resourceService.deleteMenuByMenuId(id);
+    }
+
+    /**
+     * 查询
+     * @param id  传递的实体
+     * @return repsonse
+     *
+     * @api {get} /resource/{id}  查询
+     * @apiGroup resource
+     * @apiParam  {String} id
+     */
+    @ResponseBody
+    @GetMapping("/{id}")
+    public Response getById(@PathVariable Integer id) {
+        AuthResource authResource = resourceService.selectById(id);
+        return Response.ok(authResource);
+    }
+
+    /**
+     * 获取资源父id
+     * @return repsonse
+     *
+     * @api {get} /resource/parentResource  查询
+     * @apiGroup resource
+     */
+    @ResponseBody
+    @GetMapping("/parentResource")
+    public Response getParentResource() {
+        List<AuthResource> list = resourceService.selectList(new EntityWrapper<AuthResource>().eq("TYPE", 1).eq("STATUS", 1));
+        return Response.ok(list);
+    }
+
+    @GetMapping("authorityMenu")
+    public Response getAuthorityMenu(HttpServletRequest request) {
+        AuthTokenDTO authTokenDTO = ContextHolder.get();
+        Integer uid = authTokenDTO.getUserId();
+        return resourceService.getAuthorityMenusByUid(uid);
+    }
+
+    /**
+     * 获取全部资源列
+     * @return repsonse
+     *
+     * @api {get} /resource/menus  获取全部资源列
+     * @apiGroup resource
+     */
+    @GetMapping("menus")
+    public Response getMenus() {
+
+        List<MenuTreeNode> treeNodes = new ArrayList<>();
+        List<AuthResource> resources = resourceService.getMenus();
+
+        for (AuthResource resource: resources) {
+            MenuTreeNode node = new MenuTreeNode();
+            BeanUtils.copyProperties(resource,node);
+            treeNodes.add(node);
+        }
+        List<MenuTreeNode> menuTreeNodes = TreeUtil.buildTreeBy2Loop(treeNodes,-1);
+        return Response.ok(menuTreeNodes);
+    }
+
+
 
 }

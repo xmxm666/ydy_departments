@@ -1,9 +1,7 @@
 package com.ydy.application.service.department;
 
-import javax.servlet.http.HttpServletResponse;
-
 import com.baomidou.mybatisplus.service.IService;
-import com.ydy.application.dto.department.DepartMentLoginDTO;
+import com.ydy.application.dto.department.DepartmentsAdminDTO;
 import com.ydy.application.entity.department.DepartmentsAdmin;
 import com.ydy.application.util.PageDTO;
 import com.ydy.application.util.Response;
@@ -21,11 +19,11 @@ import java.util.Map;
 public interface DepartmentsAdminService extends IService<DepartmentsAdmin> {
 
 
-	Response insertUpdate(DepartmentsAdmin departmentsAdmin);
+	Response insertUpdate(DepartmentsAdminDTO departmentsAdmin);
 
 	/**
 	 * 医生登录
-	 * @param req
+	 * @param admin
 	 * @return
 	 */
 	Response departmentsAdminLogin(DepartmentsAdmin admin);

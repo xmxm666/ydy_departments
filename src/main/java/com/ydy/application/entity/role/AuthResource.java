@@ -1,31 +1,59 @@
 package com.ydy.application.entity.role;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.IdType;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  *   资源
  */
-public class AuthResource {
+@TableName("auth_resource")
+public class AuthResource extends Model<AuthResource> {
+
+    @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
 
-    private String code;
+    @TableField("CODE")
+    private Integer code;
 
+    @TableField("NAME")
+    @NotBlank(message = "资源名称不能为空")
     private String name;
 
+    @TableField("PARENT_ID")
     private Integer parentId;
 
+    @TableField("URI")
     private String uri;
 
+    @NotNull(message = "资源类型不能为空")
+    @TableField("TYPE")
     private Short type;
 
+    @TableField("METHOD")
     private String method;
 
+    @TableField("ICON")
     private String icon;
 
+    //前端路由
+    @TableField("ROUTER")
+    private String router;
+
+    @TableField("STATUS")
     private Short status;
 
+    @TableField("CREATE_TIME")
     private Date createTime;
 
+    @TableField("UPDATE_TIME")
     private Date updateTime;
 
     public Integer getId() {
@@ -36,12 +64,12 @@ public class AuthResource {
         this.id = id;
     }
 
-    public String getCode() {
+    public Integer getCode() {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code == null ? null : code.trim();
+    public void setCode(Integer code) {
+        this.code = code;
     }
 
     public String getName() {
@@ -114,5 +142,18 @@ public class AuthResource {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getRouter() {
+        return router;
+    }
+
+    public void setRouter(String router) {
+        this.router = router;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return null;
     }
 }
