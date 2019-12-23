@@ -6,7 +6,6 @@ import com.ydy.application.dto.RoleDTO;
 import com.ydy.application.entity.role.AuthRole;
 import com.ydy.application.service.role.ResourceService;
 import com.ydy.application.service.role.RoleService;
-import com.ydy.application.service.role.UserService;
 import com.ydy.application.shiro.filter.ShiroFilterChainManager;
 import com.ydy.application.util.Response;
 import org.slf4j.Logger;
@@ -29,9 +28,6 @@ public class RoleController {
 
     @Autowired
     private RoleService roleService;
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private ResourceService resourceService;

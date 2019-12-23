@@ -1,17 +1,15 @@
 package com.ydy.application.entity.department;
 
-import java.io.Serializable;
-
-import com.baomidou.mybatisplus.enums.IdType;
-import java.util.Date;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -70,7 +68,6 @@ public class DepartmentsPatient extends Model<DepartmentsPatient> {
      * 0：不是历史用户，1：历史用户
      */
     private Integer history;
-
 
     @Override
     protected Serializable pkVal() {

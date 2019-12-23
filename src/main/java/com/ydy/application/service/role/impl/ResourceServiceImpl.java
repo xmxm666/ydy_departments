@@ -31,7 +31,7 @@ public class ResourceServiceImpl extends ServiceImpl<AuthResourceMapper, AuthRes
 
     @Override
     public Response getAuthorityMenusByUid(Integer uid) throws DataAccessException {
-        HashMap<Integer, MenuTreeNode> nodeMap = new HashMap<>();
+        LinkedHashMap<Integer, MenuTreeNode> nodeMap = new LinkedHashMap<>();
 
         //获取所有权限资源
         List<AuthResource> resources = authResourceMapper.selectAuthorityMenusByUid(uid);

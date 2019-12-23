@@ -25,7 +25,7 @@
 	</select>
 
     <select id="getPageList" parameterType="java.util.Map" resultType="com.ydy.application.dto.department.DepartmentsPatientDTO">
-        SELECT p.id, p.caseno, p.name, p.doctor, p.sex, p.age, r.id rid, r.room_name, b.id bid, b.bed_name, d.id did, d.device_number
+        SELECT p.id, p.caseno, p.name, p.doctor, p.sex, p.age, r.id rid, r.room_name, b.id bid, b.bed_name, d.id did, d.device_number deviceNumber, d.mac mac
         FROM departments_patient p
         LEFT JOIN departments_room_bed_dev_pat rbdp on p.id = rbdp.pid
         LEFT JOIN departments_room r on rbdp.rid = r.id

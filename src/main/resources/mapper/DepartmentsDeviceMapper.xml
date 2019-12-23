@@ -22,13 +22,19 @@
     </sql>
 
     <select id="getPageListCount" resultType="java.lang.Integer">
-		select count(1) from departments_device where section_id = #{map.sectionId} and is_deleted = 0
+		select count(1) from departments_device where is_deleted = 0
+        <if test="map.sectionId != null">
+            and section_id = #{map.sectionId}
+        </if>
 	</select>
 
     <select id="getPageList" resultType="com.ydy.application.entity.department.DepartmentsDevice">
         select id, device_number AS deviceNumber, mac, creat_time AS creatTime
         from departments_device
-        where section_id = #{map.sectionId} and is_deleted = 0
+        where is_deleted = 0
+        <if test="map.sectionId != null">
+            and section_id = #{map.sectionId}
+        </if>
         <if test="map.offset != null and map.offset > 0">
             limit #{map.limit} , #{map.offset}
         </if>

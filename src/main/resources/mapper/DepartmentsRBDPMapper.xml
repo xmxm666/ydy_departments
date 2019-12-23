@@ -29,4 +29,11 @@
 		update departments_room_bed_dev_pat set did = null where did = #{did}
 	</update>
 
+	<select id="getPatientMac" resultType="java.lang.String">
+        SELECT d.mac
+        FROM departments_room_bed_dev_pat rbdp
+        LEFT JOIN departments_device d	on d.id = rbdp.did
+        WHERE rbdp.pid is not NULL
+    </select>
+
 </mapper>

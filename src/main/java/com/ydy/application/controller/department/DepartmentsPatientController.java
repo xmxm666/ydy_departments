@@ -1,30 +1,18 @@
 package com.ydy.application.controller.department;
 
 
-import java.util.List;
-import java.util.Map;
-
 import com.alibaba.fastjson.JSONObject;
 import com.ydy.application.dto.department.DepartmentsPatientDTO;
 import com.ydy.application.filter.AuthTokenDTO;
+import com.ydy.application.service.department.DepartmentsPatientService;
 import com.ydy.application.token.ContextHolder;
+import com.ydy.application.util.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.ydy.application.entity.department.DepartmentsPatient;
-import com.ydy.application.service.department.DepartmentsPatientService;
-import com.ydy.application.util.Response;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 /**
  *  患者
@@ -58,8 +46,6 @@ public class DepartmentsPatientController {
         queryInfo.put("offset",json.getInteger("pageSize"));
         return Response.ok(departmentsPatientService.selectPageList(queryInfo));
     }
-
-    
 
 
     /**
@@ -122,26 +108,14 @@ public class DepartmentsPatientController {
      *   病人出院
      * @param id  实体ID
      * @return repsonse
-     * @api {delete} /departmentsPatient/{id}  病人出院
+     * @api {get} /departmentsPatient/out/{id}  病人出院
      * @apiGroup patient
      * @apiParam  {String} id
      */
     @ResponseBody
-    @DeleteMapping("/{id}")
+    @GetMapping("/out/{id}")
     public Response patientOutHospital(@PathVariable Integer id){
         return departmentsPatientService.patientOutHospital(id);
     }
-	
-	 /**
-     * 查询全部
-     * @param
-     * @return repsonse
-     */
-    /*@ResponseBody
-    @GetMapping
-    public Response departmentsPatientAll(@PathVariable Integer id){
-        List<DepartmentsPatient> list = departmentsPatientService.selectList(new EntityWrapper<DepartmentsPatient>().eq("1", "1"));
-        return Response.ok(list);
-    }*/
 
 }

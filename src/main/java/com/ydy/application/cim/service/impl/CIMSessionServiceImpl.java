@@ -27,6 +27,7 @@ import com.ydy.application.cim.service.CIMSessionService;
 import com.ydy.application.service.department.DepartmentsSectionService;
 import com.ydy.application.util.Constants;
 import com.ydy.application.util.RedisUtil;
+import io.netty.channel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -70,7 +71,13 @@ public class CIMSessionServiceImpl implements CIMSessionService {
 		String sectionId = getId(account);
 		CIMSession session = (CIMSession) redisUtil.hget(Constants.CIM_SECTION + sectionId, account);
 		 if (session != null){
-			 session.setSession(nioSocketAcceptor.getManagedSession(session.getNid()));
+			 Channel managedSession = nioSocketAcceptor.getManagedSession(session.getNid());
+			 //服务器关闭时存在部分连接未关闭，遗留在redis中
+			 if(managedSession == null) {
+			 	this.remove(account);
+			 	return null;
+			 }
+			 session.setSession(managedSession);
 		 }
 		 return session;
 	}

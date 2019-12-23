@@ -63,6 +63,7 @@ public class SessionClosedHandler implements CIMRequestHandler {
 
 		oldSession.setState(CIMSession.STATE_DISABLED);
 		oldSession.setNid(null);
+		oldSession.closeOnFlush();
 		cimSessionService.remove(account.toString());
 	}
 

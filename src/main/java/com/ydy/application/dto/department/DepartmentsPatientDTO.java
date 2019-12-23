@@ -1,12 +1,7 @@
 package com.ydy.application.dto.department;
 
 import com.ydy.application.entity.department.DepartmentsPatient;
-import com.ydy.application.entity.department.DepartmentsRoom;
 import lombok.Data;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Data
 public class DepartmentsPatientDTO extends DepartmentsPatient {
@@ -24,5 +19,11 @@ public class DepartmentsPatientDTO extends DepartmentsPatient {
 	private Integer did;
 
 	private String deviceNumber;
+
+	//设备mac地址
+	private String mac;
+
+	//患者数据
+	DepartmentsDataDTO patientData;
 	
 }

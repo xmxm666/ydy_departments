@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ydy.application.mapper.department.DepartmentsDataMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ydy.application.entity.department.DepartmentsData">
+        <id column="id" property="id" />
+        <result column="mac" property="mac" />
+        <result column="spo2" property="spo2" />
+        <result column="hr" property="hr" />
+        <result column="rr" property="rr" />
+        <result column="sbp" property="sbp" />
+        <result column="dbp" property="dbp" />
+        <result column="creat_time" property="creatTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, mac, spo2, hr, rr, sbp, dbp, creat_time AS creatTime
+    </sql>
+
+    <select id="slectLastData" parameterType="java.lang.Integer" resultType="com.ydy.application.dto.department.DepartmentsDataDTO">
+        select data.mac, data.spo2, data.hr, data.rr, data.sbp, data.dbp, d.id as did
+        FROM departments_data data
+        LEFT JOIN departments_device d on data.mac = d.mac
+        WHERE exists(select 1 from departments_data GROUP BY mac HAVING data.id = max(id))
+        and d.section_id = #{sectionId}
+    </select>
+
+</mapper>

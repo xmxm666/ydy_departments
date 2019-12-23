@@ -86,7 +86,7 @@ public class DefaultMessagePusher implements CIMMessagePusher {
 		 * 如果是Android，浏览器或者windows客户端则直接发送
 		 */
 		if (session.isConnected() && Objects.equals(host, session.getHost())) {
-			session.write(message);
+			boolean isWrite = session.write(message);
 		}
 
 	}
