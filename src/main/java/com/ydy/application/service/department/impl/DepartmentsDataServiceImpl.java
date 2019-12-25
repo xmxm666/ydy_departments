@@ -67,6 +67,7 @@ public class DepartmentsDataServiceImpl extends ServiceImpl<DepartmentsDataMappe
                 if(patient.getDid().compareTo(data.getDid()) == 0) {
                     patient.setPatientData(data);
                     break;
+
                 }
             }
         }
