@@ -6,25 +6,22 @@ import com.farsunset.cim.sdk.server.model.Message;
 import com.ydy.application.cim.push.DefaultMessagePusher;
 import com.ydy.application.dto.department.DepartmentsDataDTO;
 import com.ydy.application.dto.department.DepartmentsPatientDTO;
+import com.ydy.application.dto.department.DepartmentsPatientDataDTO;
 import com.ydy.application.entity.department.DepartmentsData;
+import com.ydy.application.entity.department.DepartmentsDevice;
 import com.ydy.application.entity.department.DepartmentsSection;
 import com.ydy.application.mapper.department.DepartmentsDataMapper;
 import com.ydy.application.mapper.department.DepartmentsPatientMapper;
 import com.ydy.application.mapper.department.DepartmentsRBDPMapper;
 import com.ydy.application.service.department.DepartmentsDataService;
+import com.ydy.application.service.department.DepartmentsDeviceService;
 import com.ydy.application.service.department.DepartmentsSectionService;
-import com.ydy.application.util.Constants;
-import com.ydy.application.util.JsonUtil;
-import com.ydy.application.util.RedisUtil;
-import com.ydy.application.util.Response;
+import com.ydy.application.util.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -52,24 +49,23 @@ public class DepartmentsDataServiceImpl extends ServiceImpl<DepartmentsDataMappe
     @Resource
     private DepartmentsPatientMapper patientMapper;
 
+    @Resource
+    private DepartmentsDeviceService deviceService;
+
     @Override
     public Response dataList(Integer sectionId) {
         Map<String,Object> queryInfo = new HashMap<>();
         queryInfo.put("sectionId", sectionId);
         List<DepartmentsPatientDTO> patientList = patientMapper.getPageList(queryInfo);
         //获取当前科室下所有设备的最后一条数据
-        List<DepartmentsDataDTO> dataList = baseMapper.slectLastData(sectionId);
+//        List<DepartmentsDataDTO> dataList = baseMapper.slectLastData(sectionId);
         for (DepartmentsPatientDTO patient : patientList) {
             if(patient.getDid() == null) {
                 continue;
             }
-            for (DepartmentsDataDTO data : dataList) {
-                if(patient.getDid().compareTo(data.getDid()) == 0) {
-                    patient.setPatientData(data);
-                    break;
-
-                }
-            }
+            DepartmentsDataDTO dataDTO = baseMapper.selectLastDataByMac(patient.getMac());
+            dataDTO.setDid(patient.getDid());
+            patient.setPatientData(dataDTO);
         }
         return Response.ok(patientList);
     }
@@ -124,7 +120,20 @@ public class DepartmentsDataServiceImpl extends ServiceImpl<DepartmentsDataMappe
             if(hmget != null && hmget.size() > 0) {
                 //该科室有连接用户时
                 //获取当前科室下所有设备的最后一条数据
-                List<DepartmentsDataDTO> dataList = baseMapper.slectLastData(section.getId());
+                List<DepartmentsDataDTO> dataList = new ArrayList<>();
+
+                Map<String,Object> queryInfo = new HashMap<>();
+                queryInfo.put("sectionId", section.getId());
+                List<DepartmentsPatientDTO> patientList = patientMapper.getPageList(queryInfo);
+                for (DepartmentsPatientDTO patient : patientList) {
+                    if(patient.getDid() == null) {
+                        continue;
+                    }
+                    DepartmentsDataDTO dataDTO = baseMapper.selectLastDataByMac(patient.getMac());
+                    dataDTO.setDid(patient.getDid());
+                    dataList.add(dataDTO);
+                }
+
                 for (Map.Entry<Object, Object> map : hmget.entrySet()) {
                     Message message = new Message();
                     message.setAction(Constants.ACTION_NORMAL);
@@ -140,5 +149,44 @@ public class DepartmentsDataServiceImpl extends ServiceImpl<DepartmentsDataMappe
 
         }
 
+    }
+
+    @Override
+    public Response getPatientData(DepartmentsPatientDataDTO patientData) {
+        DepartmentsDevice device = deviceService.selectById(patientData.getDid());
+        patientData.setMac(device.getMac());
+        switch (patientData.getTimeType()) {
+            case 1 :            //  1小时 实时
+                Date oneHourAgo = DateUtil.headDate(-1);
+                patientData.setLastDate(oneHourAgo);
+                break;
+            case 2 :            //  12小时 时
+                Date hoursAgo = DateUtil.headDate(-12);
+                patientData.setLastDate(hoursAgo);
+                break;
+            case 3 :            //  3天  日
+                Date dateAgo = DateUtil.headDate(-72);
+                patientData.setLastDate(dateAgo);
+                break;
+            case 4 :            //  7天  周
+                Date weekAgo = DateUtil.headDate(-168);
+                patientData.setLastDate(weekAgo);
+                break;
+            default:
+                break;
+        }
+        List<DepartmentsData> dataList = baseMapper.getPatientData(patientData);
+        return Response.ok(dataList);
+    }
+
+    @Override
+    public Response patientDetailData(Integer pid) {
+        DepartmentsPatientDTO patientDTO = patientMapper.selectPatient(pid);
+        DepartmentsDevice device = deviceService.selectById(patientDTO.getDid());
+        DepartmentsDataDTO dataDTO = baseMapper.selectLastDataByMac(device.getMac());
+        dataDTO.setDid(device.getId());
+        patientDTO.setDeviceNumber(device.getDeviceNumber());
+        patientDTO.setPatientData(dataDTO);
+        return Response.ok(patientDTO);
     }
 }

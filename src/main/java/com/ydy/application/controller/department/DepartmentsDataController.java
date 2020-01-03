@@ -1,15 +1,14 @@
  package com.ydy.application.controller.department;
 
 
- import com.ydy.application.filter.AuthTokenDTO;
+ import com.ydy.application.dto.department.DepartmentsPatientDataDTO;
+import com.ydy.application.filter.AuthTokenDTO;
 import com.ydy.application.service.department.DepartmentsDataService;
 import com.ydy.application.token.ContextHolder;
 import com.ydy.application.util.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
  /**
  *
@@ -32,74 +31,41 @@ public class DepartmentsDataController {
       */
      @ResponseBody
      @GetMapping("/dataList")
-     public Response getDepartmentsRoomList() {
+     public Response getDataList() {
          AuthTokenDTO authTokenDTO = ContextHolder.get();
          return departmentsDataService.dataList(authTokenDTO.getSectionId());
      }
+
+     /**
+      * 根据pid获取生命体征
+      * @return repsonse
+      *
+      * @api {get} /departmentsData/patientDetailData 根据pid获取生命体征
+      * @apiGroup data
+      */
+     @ResponseBody
+     @GetMapping("/patientDetailData/{pid}")
+     public Response getDataByPid(@PathVariable Integer pid) {
+         return departmentsDataService.patientDetailData(pid);
+     }
+
+    /**
+    * 获取  实时、时、日、周  相应的数据
+    * spo2, hr, rr, sbp, dbp
+    *
+    * @api {get} /departmentsData/patientData 患者监测数据
+    * @apiGroup data
+     *
+     * @apiParam  {Number} did    设备id
+     * @apiParam  {Number} dataType    数据类型     1:spo2, 2:hr, 3:rr, 4:nibp
+     * @apiParam  {Number} timeType    时间类型     1:实时、2:时、3:日、4:周
+    */
     @ResponseBody
-    @GetMapping("/test")
-    public void departmentsDataTest() {
-        departmentsDataService.sendClient();
+    @PostMapping("/patientData")
+    public Response getPatientData(@RequestBody DepartmentsPatientDataDTO patientData) {
+        return departmentsDataService.getPatientData(patientData);
     }
 
-//    /**
-//     * 新增
-//     * @param departmentsData  传递的实体
-//     * @return repsonse
-//     */
-//    @ResponseBody
-//    @PostMapping
-//    public Response departmentsDataInsert(@RequestBody DepartmentsData departmentsData) {
-//        Boolean flag = departmentsDataService.insert(departmentsData);
-//        return Response.ok(flag);
-//    }
-//
-//	/**
-//     * 更新
-//     * @param departmentsData  传递的实体
-//     * @return repsonse
-//     */
-//    @ResponseBody
-//    @PutMapping("/{id}")
-//    public Response departmentsDataUpdate(@RequestBody DepartmentsData departmentsData) {
-//		Boolean flag = departmentsDataService.updateById(departmentsData);
-//        return Response.ok(flag);
-//    }
-//
-//	/**
-//     * 查询
-//     * @param departmentsData  传递的实体
-//     * @return repsonse
-//     */
-//    @ResponseBody
-//    @GetMapping("/{id}")
-//    public Response departmentsDataUpdate(@PathVariable Long id) {
-//		DepartmentsData result = departmentsDataService.selectById(id);
-//        return Response.ok(result);
-//    }
-//
-//    /**
-//     * 根据id删除对象
-//     * @param id  实体ID
-//     * @return repsonse
-//     */
-//    @ResponseBody
-//    @DeleteMapping("/{id}")
-//    public Response departmentsDataDelete(@PathVariable Long id){
-//        Boolean flag = departmentsDataService.deleteById(id);
-//        return Response.ok(flag);
-//    }
-//
-//	 /**
-//     * 查询全部
-//     * @param null
-//     * @return repsonse
-//     */
-//    @ResponseBody
-//    @GetMapping
-//    public Response departmentsDataAll(@PathVariable Long id){
-//        List<DepartmentsData> list = departmentsDataService.selectList(new EntityWrapper<DepartmentsData>().eq("1", "1"));
-//        return Response.ok(list);
-//    }
+
 
 }

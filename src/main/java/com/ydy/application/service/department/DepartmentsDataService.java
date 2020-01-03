@@ -1,6 +1,7 @@
 package com.ydy.application.service.department;
 
 import com.baomidou.mybatisplus.service.IService;
+import com.ydy.application.dto.department.DepartmentsPatientDataDTO;
 import com.ydy.application.entity.department.DepartmentsData;
 import com.ydy.application.util.Response;
 
@@ -23,5 +24,8 @@ public interface DepartmentsDataService extends IService<DepartmentsData> {
     //  模拟向客户端发送数据
     public void sendClient();
 
+    //获取  实时、时、日、周  相应的数据
+    public Response getPatientData(DepartmentsPatientDataDTO patientData);
 
+    public Response patientDetailData(Integer pid);
 }

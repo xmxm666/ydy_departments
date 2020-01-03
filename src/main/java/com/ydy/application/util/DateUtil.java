@@ -281,6 +281,7 @@ public class DateUtil {
 		GregorianCalendar gc = new GregorianCalendar();
 		gc.setTime(date);
 		gc.add(5, -1);
+		gc.add(5, -1);
 		return roundToHour(gc.getTime());
 	}
 
@@ -660,14 +661,21 @@ public class DateUtil {
 	    calendar.set(Calendar.MILLISECOND,mill);
 	    return calendar.getTime();
 	}
+
+	/**
+	 * 取到 hours 以前时间
+	 * @param hours
+	 * @return
+	 */
+	public static Date headDate(int hours){
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.HOUR_OF_DAY, hours);
+		return cal.getTime();
+	}
 	
 	public static void main(String[] args){
-		String cron=getCron(new Date());
-		System.out.println("测试结果======="+cron);
-		String[] cronArr=cron.split(" ");
-		for(int i=0;i<cronArr.length;i++){
-			System.out.println("时间======="+cronArr[i]);
-		}
-		
+		Date lastDayOfWeek = headDate(168);
+		System.out.println(toSeconds(lastDayOfWeek));
+
 	}
 }
